@@ -1,0 +1,56 @@
+@startuml
+
+class SensorDataHandler
+interface internal_sensors
+interface ControllerAreaNetwork
+interface ultrasonic
+
+internal_sensors <|-- SensorDataHandler
+ControllerAreaNetwork <|-- SensorDataHandler
+ultrasonic <|-- SensorDataHandler
+
+class SensorDataHandler {
+float gyro[3]
+float accel[3]
+float magn[3]
+sensorPin right_sensor
+sensorPin back_sensor
+sensorPin left_sensor
+sensorPin front_sensor
+data_frame_queue data_queue[MAX_PARALEL_SENDS]
+
+  void initHardware(void)
+static void vReceiver(void *arg)
+static void vSender(void *arg)
+static void floatToCAN(float data, can_frame_types_t *can_frame_types)
+static void setMode(int mode)
+static void handle_to_send(can_frame_types_t message)
+static void saveId(int indx)
+static int priorityHandler(priority_can_id_t priority)
+}
+
+interface internal_sensors {
+void MX_I2C1_Init(void)
+void MX_SPI1_Init(void)
+void initGyroscope(void)
+void initAccelerometer(void)
+void initMagnetometer(void)
+uint8_t readGyroscope(float* data)
+uint8_t readAccelerometer(float* data)
+uint8_t readMagnetometer(float* data)
+}
+
+interface ControllerAreaNetwork {
+extern CAN_HandleTypeDef hcan
+	extern int errrx
+	extern int errtx
+        static uint16_t can_code_identifier_pd(...)
+	void MX_CAN_Init(void)
+	ExitStatus_t can_transmit_data_frame_pd(...)
+	can_frame_types_t can_receive_data_frame_pd(void)
+	inline can_frame_types_t can_decode_identifier_pd(...)
+}
+
+interface ultrasonic{
+  readUltrasonic()
+}

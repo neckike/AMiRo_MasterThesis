@@ -1,0 +1,105 @@
+@startuml
+robust "Default" as Def
+robust "Transmitter_1" as T1
+robust "Transmitter_2" as T2
+robust "Transmitter_3" as T3
+robust "Transmitter_4" as T4
+robust "Receiver" as R
+
+@R
+0 is Idle
+
+10 is Polling
+20 is Idle
+30 is Processing
+R -> T1 : gyroscope 'x' 20ms
+40 is Idle
+50 is Processing
+R -> T2 : accelerometer 'z' 10ms
+60 is Idle
+70 is Processing
+R -> Def : one time ultrasonic_2
+80 is Idle
+90 is Processing
+R -> T3 : ultrasonic_1 10ms
+100 is Idle
+110 is Processing
+R -> T1 : stop gyroscope 'x'
+120 is Idle
+130 is Polling
+140 is Idle
+150 is Processing
+R -> T4 : magnetometer 'y' 30ms
+160 is Idle
+170 is Processing
+R -> T1 : ultrasonic_3 10ms
+180 is Idle
+190 is Polling
+200 is Idle
+210 is Polling
+R -> T3 : stop ultras_1
+220 is Idle
+
+R@20 <-> @30 : {10ms}
+
+@T1
+0 is Idle
+30 is Sending
+50 is Idle
+70 is Sending
+90 is Idle
+170 is Sending
+180 is Idle
+190 is Sending
+200 is Idle
+210 is Sending
+220 is Idle
+
+@T2
+0 is Idle
+50 is Sending 
+60 is Idle
+70 is Sending
+80 is Idle
+90 is Sending
+100 is Idle
+110 is Sending
+120 is Idle
+130 is Sending
+140 is Idle
+150 is Sending
+160 is Idle
+170 is Sending
+180 is Idle
+190 is Sending
+200 is Idle
+210 is Sending
+220 is Idle
+
+@T3
+0 is Idle
+90 is Sending
+100 is Idle
+110 is Sending
+120 is Idle
+130 is Sending
+140 is Idle
+150 is Sending
+160 is Idle
+170 is Sending
+180 is Idle
+190 is Sending
+200 is Idle
+
+
+@T4
+0 is Idle
+150 is Sending
+180 is Idle
+210 is Sending
+
+@Def
+0 is Idle
+70 is Sending
+80 is Idle
+@enduml
