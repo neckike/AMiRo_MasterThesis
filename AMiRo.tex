@@ -284,7 +284,6 @@ The global class is the responsible for creating each object from each sensor an
     \label{fig:LRclass}
 \end{figure}
 
-
 \chapter{Controller Area Network}
 \label{chap:CAN}
 This chapter explains how to receive and transmit CAN frames in the AMiRo. The functionality of the CAN module had to be merged with the current ControllerAreaNetworkRx.cpp and ControllerAreaNetworkTx.cpp of the existing repository of AMiRo \cite{AMiRo_Wiki}. The ControllerAreaNetwork.h however, is the same that the DAEbot project is using. The reason behind sharing the ControllerAreaNetwork.h among projects is to be able to use a single Relfective Operator for both systems AMiRo and DAEbot so it is easier to compare functionalities.
@@ -292,16 +291,20 @@ This chapter explains how to receive and transmit CAN frames in the AMiRo. The f
 \section{Convention used for sending and receiving frames}
 \label{sec:canconv}
 
-The format of the CAN frames was done accordingly with the pre-established convention for the DAEbot project \cite{DAEbot_Wiki}. See figure \ref{fig:can}
+The format of the CAN frames was done accordingly with the pre-established convention for the DAEbot project \cite{DAEbot_Wiki}. The format of the standard id from a CAN frame can be seen in figure \ref{fig:can}, where it is basically divided into three main parts. The command or sensor bit is the bit that allows devices on the CAN bus to know if the frame belongs to a command, i.e. knowing the value 'x' axis of the gyroscope, or setting the LEDs to red, or if it belongs to a sensor frame, i.e. the actual value of the 'x' axis of the gyroscope.
+
+The second part is the priority which allows the devices on the bus know the priority of the command or sensor. If there are two frames in the bus at the same time asking for a sensor value from the same board for example, the priority will allow the system to preempt the frame of the one with higher priority.
+
+The third and last part of the id from the frame is the topic id. The list for the topics can be seen in the ControllerAreaNetwork.h shared by all the devices or also from the ods file inside the same path \textit{Peripheral-Drivers/ControllerAreaNetwork/} from figure \ref{fig:DAAMIROstr}.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{can_structure}
-    \caption{Pre-established CAN frame format}
+    \caption{Pre-established CAN frame format \cite{DAEbot_Wiki}}
     \label{fig:can}
 \end{figure}
 
-For the transmission of a CAN frame, the id is coded according to figure \ref{fig:can} and when a CAN frame is received, the id is decoded into the same structure. The CAN frame pre-established structure can be seen in snip of code \ref{CAN:frame}, which can be compared with the figure \ref{fig:can}.
+For the transmission of a CAN frame, the id is coded according to figure \ref{fig:can} and when a CAN frame is received, the id is decoded into the same structure. The CAN frame pre-established structure can be seen in snip of code \ref{CAN:frame}, which can be compared with the figure \ref{fig:can}. In this structure the only thing that has not been yet discussed is the data itself. The dlc is the number of bytes to be transmitted and the information is stored in the data8, data16 and data32 arrays. Thanks to the \textit{union} of these arrays, the same value can be accessed in different bit sizes.
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[caption = CAN frame, label = CAN:frame, language = C, captionpos = b]
@@ -319,15 +322,39 @@ typedef struct can_frame_types {
 \end{lstlisting}
 \end{minipage}
 
-In order to send a CAN frame, can\_transmit\_data\_frame\_pd(...) can be called. When sending a CAN frame, the id is set to be in standard mode. The CAN frame that is sent consists of three main parts: id, DLC, and the data. The id is therefore set with the can\_code\_identifier\_pd(...) function before actually calling the transmit function. This function combines the c\_s bit with the priority bit and then combines that value to the topic ID. The CAN frame is sent with the function HAL\_CAN\_Transmit(...).
+In order to send a CAN frame, can\_transmit\_data\_frame\_pd(...) can be called. When sending a CAN frame, the id is set to be in standard mode. The CAN frame that is sent consists of three main parts: id, DLC, and the data. The id is therefore set with the can\_code\_identifier\_pd(...) function before actually calling the transmit function. This function combines the c\_s bit with the priority bit and then combines that value to the topic ID. The CAN frame is later sent through the CAN driver.
 
 On the CAN reception side, the status of the reception is assigned when calling to the can\_receive\_data\_frame\_pd(...) function. The status of the CAN reception can be successful, timeout, or error. Then the id of the CAN frame gets decoded with the function can\_decode\_identifier\_pd(...) and the data frames are passed into a global structure like in snip of code \ref{CAN:frame}
 
 Note that can\_code\_identifier\_pd(...) and can\_decode\_identifier\_pd(...) are functions that were already implemented beforehand, for this project it was necessary to adjust both functions to operate with the current hardware platform.
 
-\section{Interpreting outputs of the sensors}
+\section{Interpreting CAN frames of the sensors}
 \label{sec:sensorout}
-%explicar cómo interpretar valores de sensores.
+In this section it will be explained how to read the frames corresponding to each sensor. For the same reason, this section is divided into two subsections: sensors and actuators.
+
+\subsection{Sensors}
+In order to interact with a sensor, the id from the CAN frame's command to be sent has to obey the convention shown in figure \ref{fig:can} and its content, the data from the CAN frame has to follow the convention shown in figure  \ref{fig:sensormodes} created by Uwe Jahn for the DAEbot project.
+
+%explicar la figura de los modos para recibir valores de sensores.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{modes}
+    \caption{Pre-established CAN modes for transmitting sensor data \cite{DAEbot_Wiki}}
+    \label{fig:sensormodes}
+\end{figure}
+
+\subsubsection{Gyroscope}
+\subsubsection{Accelerometer}
+\subsubsection{Magnetometer}
+\subsubsection{Floor Proximity Sensor}
+\subsubsection{Encoder}
+\subsubsection{Power Status}
+\subsubsection{Proximity Ring}
+
+\subsection{Actuators}
+\subsubsection{Motors}
+\subsubsection{LEDs}
 
 \chapter{Sensor data handler}
 \label{chap:sensorDH}
