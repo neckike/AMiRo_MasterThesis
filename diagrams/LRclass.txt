@@ -1,0 +1,65 @@
+@startuml
+class LightRing
+class ControllerAreaNetworkRx
+class ControllerAreaNetworkTx
+class Global
+class Leds
+
+ControllerAreaNetworkRx <|-- LightRing
+ControllerAreaNetworkTx <|-- LightRing
+Global *- "1" LightRing
+Global *-- "1" Leds
+
+class LightRing {
++extern Global global
+
+    +virtual msg_t updateSensorVal() 
+    +virtual void setMotor(vel_1, vel_2) = 0
+    +virtual void magnetometerSend(priority) = 0
+    +virtual void gyroscopeSend(priority) = 0
+    +virtual void accelerometerSend(priority) = 0
+    +virtual void odometrySend(priority) = 0
+    +virtual void proximitySend(priority) = 0
+    +virtual void proximityRingSend(priority) = 0
+    +virtual void powerStatusSend(priority) = 0
+    +virtual void commandLights(light_id, red, green, blue)
+}
+
+class ControllerAreaNetworkTx {
++virtual msg_t updateSensorVal()
++void can_transmit_data_frame_pd(*can_frame_types)
++uint16_t can_code_identifier_pd(*priority_can_id, *c_s_bit_can_id, *topic_can_id)
+#virtual msg_t updateSensorVal() = 0
+#virtual void setMotor(vel_1, vel_2) = 0
+#virtual void magnetometerSend(priority) = 0
+#virtual void gyroscopeSend(priority) = 0
+#virtual void accelerometerSend(priority) = 0
+#virtual void odometrySend(priority) = 0
+#virtual void proximitySend(priority) = 0
+#virtual void proximityRingSend(priority) = 0
+#virtual void powerStatusSend(priority) = 0
+#virtual void commandLights(light_id, red, green, blue) = 0
+}
+
+class ControllerAreaNetworkRx {
++extern Global global
++can_frame_types_t receivedCAN
+#uint16_t proximityRingValue[8]
+#int actualSpeed[2]
+#uint16_t proximityFloorValue[4]
+#int32_t magnetometerValue[3]
+#int16_t gyroscopeValue[3]
+#int16_t accelerometerValue[3]
+#can_frame_types_t can_decode_identifier_pd(canid)
++can_frame_types_t can_receive_data_frame_pd(*frame)
+}
+
+class Global{
++Leds leds
++LightRing robot
+}
+
+class Leds{
++array<8> leds
+}
+@enduml

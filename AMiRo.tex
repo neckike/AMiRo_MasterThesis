@@ -77,6 +77,19 @@ Some of the main characteristics of a RTOS are the following:
 \end{itemize}
 
 \section{Operator Controller Module}
+
+The DA\_AMiRo is inteded to work according to an OCM \cite{ocmAuto} software architecture similar to the one DAEbot was implemented with. In this structure there are three basic controllers: Internal Controller, Reflective Operator, and Cognitive Operator. In order to have a more precise overview of how these three controllers work in the DAEbot, figure \ref{fig:ocm} is explained by a direct quote from the Wiki:
+
+\say{Refering to figure \ref{fig:ocm}, the Controllers (red) are used to connect all sensors and actuators. The Controllers need to be configured and programmed once, so the software on the controllers is mostly fixed and does not need to be flexible. The Reflective Operator(s) (yellow) control the Controllers. The Reflective Operator's software is the adaptable part of the distributed system - it changes from application to application. These Operator Controller Module(s) are located on the robot itself and let it act autonomously. The Cognitive Operator is hosted on a server and is used to optimize, program and interact with the user. The Cognitive Operator is connected via a wireless connection and can (only) interact with the Reflective Operator(s).}\cite{Wiki}.
+
+\begin{figure}[h!t]
+	\centering
+	\includegraphics[width=\textwidth]{ocm}
+    \caption{OCM software arquitecture for the DAEbot\cite{Wiki}.}
+    \label{fig:ocm}
+\end{figure}
+\clearpage
+
 The OCM was introduced by a group of Professors in the University of Paderborn. The concept aimed to structure and design a reconfigurable controller systems \cite{ocmAuto}. As mentioned before, there are three different levels in the OCM. The first one is the lowest level of the OCM also simply known as the Controller. This level interacts directly with the plant of the system, which means that the control signal is produced and measured here. It is also necessary that the software processing in this layer is quasi-continuous so that the measured values are processed in real-time conditions \cite{ocmAuto}.
 
 The second layer is called the reflective operator. It is in this layer where the monitoring and the controlling routines are executed \cite{ocmAuto}. This layer does not have access to the actuators directly, because the Controller is already doing this. The expected result is that the Reflective Operator modifies the Controller, sometimes also changing between different pre-established Controller configurations. This level also requires a quasi-continuous operations like a continuous adaptation algorithm or a watchdog. This operator also has to operate under hard-time constraints because its relation with the Controller. In short, this layer serves as a interface between the Cognitive Operator and the Controller \cite{ocmAuto}.
@@ -175,7 +188,7 @@ The operating system running on the Overo COM is based on the Linux Yocto refere
 
 \section{Software Architecture of AMiRo}
 \label{sec:soft}
-As it has been discussed in previous sections, the AMiRo project was started back in 2015 and it is still being maintained. The version 1.0 of the repository is the one being used for this project \cite{AMiRo_Git}.
+As it has been discussed in previous sections, the AMiRo project was started back in 2015 and it is still being maintained. The version 1.0 of the repository was the base used for this project \cite{AMiRo_Git}.
 
 \subsection{AMiRo bootloader}
 \label{sub:btl}
@@ -222,14 +235,58 @@ The structure of the AMiRo Operating System, including the files that are being 
 
 %Quizás algo más a cerca de AMiRo (apps, applicaciones pensadas, demos....)
 
-\subsection{Overall structure}
+\subsection{DA\_AMiRo software structure}
 From the past sections the hardware and software structure of the AMiRo was mentioned and briefly discussed. From this point forward the structure and functionality of the DA\_AMiRo project will be discussed as it is the central point of the master thesis. As a friendly reminder, the reader can obtain the source codes made for the DA\_AMiRo project from the repository \cite{AMiRo_Git}.
 
-Now a %class diagram of DiWheelDrive
-%talk about the DA_AMiRo structure, which ones where modified, which ones where maintained as they were, and talk about the classes heritage. (class diagram)
+In last section, the AMiRo's Operating System structure was introduced. This Operating System is the one located on top of figure \ref{fig:DAAMIROstr}, inside the folder called \textit{amiro\_1.0\_stable}. This Operating System was hugely modified to fit the requirements of the DA\_AMiRo project, and it's functionality will be discussed in section \ref{sub:DAAMIROOS}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{DAAMIRO}
+    \caption{DA\_AMiRo overall structure}
+    \label{fig:DAAMIROstr}
+\end{figure}
+
+The configuration files for the three projects are located inside the \textit{Devices} folder which can be visualized in figure \ref{fig:DAAMIROstr}. They configure the QT IDE for each of the three boards, so the user can easily code and create the binary to program the AMiRo's boards. It is also inside this folder where the Reflective Operator is located. The Reflective Operator consists of a simple C code for programming the MuRoX board, but also has a Matlab project responsible for creating an AMiRo's compatible program from a Simulink model. These issues will be discussed further in chapter \ref{chap:reflective}.
+
+Inside the \textit{Peripheral-Drivers} the user can find the ControllerAreaNetwork.h responsible of having the structures and all the definitions that are being used by both the Internal Controller corresponding to the three basic boards and the Reflective Operator which is in charge of the MuRoX board. It is also inside this folder that the \textit{sensorhandler.cpp} and \textit{sensorhandler.h} are found. These both files manage the scheduling of the sensor data and they will be discussed in chapter \ref{chap:sensorDH}.
+
+Finally, the folder \textit{Documentation} has some of the papers and information that the AMiRo has had since it was created. The reader can go inside this folder for getting more information about the AMiRo. In the other hand, the folder \textit{PusleAT} was created for a future reference and it is still a work in progress.
+
+\subsection{DA\_AMiRo Operating System's functionality}
+\label{sub:DAAMIROOS}
+In this section, the functionality of the DA\_AMiRo Operating System from figure \ref{fig:OS} will be addressed.
+
+The DiWheelDrive board, the DiWheelDrive class inherits from both ControllerAreaNetworkRx.cpp and from ControllerAreaNetworkTx.cpp, making it capable of sending and receiving CAN frames. This happens exactly the same in the three boards. The CAN frame structure will be further discussed in chapter \ref{chap:CAN}. The DiWheelDrive class also implements the functions for updating each of the sensor's values and sending independently the data via CAN interface. As it can be seen in figures \ref{fig:DWDclass}, \ref{fig:PMclass}, and \ref{fig:LRclass}, DiWheelDrive has virtual functions of every sensor including the Power Management board and also the Light Ring board. These functions however, have a '= 0' which means that they are not being implemented in this specific class. Similarly in the other two boards the same thing happens with their own set of sensors.
+
+This means that in the DiWheelDrive class, the functions that are being implemented correspond to the gyroscope, accelerometer, magnetometer, proximity sensors, motors, and encoders. In the Power Management class the implemented functions include proximity sensors and power status sensors, and in the Light Ring class the implemented function concerns only the LEDs for the purposes of DA\_AMiRo.
+
+The global class is the responsible for creating each object from each sensor and encapsulating them under the name of 'robot'. This makes the \textit{robot's} attributes accessible from other classes. This means that, for example, the gyroscope's value can be updated and outputted as a part of \textit{robot} from other parts of the code. The global object is finally initialized in the main function, as well as the threads responsible for managing the scheduler of the sensor's data but this subject will be discussed more deeply in chapter \ref{chap:sensorDH}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{DWDclass}
+    \caption{DiWheelDrive broad class diagram}
+    \label{fig:DWDclass}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{PMclass}
+    \caption{PowerManagement broad class diagram}
+    \label{fig:PMclass}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{LRclass}
+    \caption{LightRing broad class diagram}
+    \label{fig:LRclass}
+\end{figure}
+
 
 \chapter{Controller Area Network}
-
+\label{chap:CAN}
 This chapter explains how to receive and transmit CAN frames in the AMiRo. The functionality of the CAN module had to be merged with the current ControllerAreaNetworkRx.cpp and ControllerAreaNetworkTx.cpp of the existing repository of AMiRo \cite{AMiRo_Wiki}. The ControllerAreaNetwork.h however, is the same that the DAEbot project is using. The reason behind sharing the ControllerAreaNetwork.h among projects is to be able to use a single Relfective Operator for both systems AMiRo and DAEbot so it is easier to compare functionalities.
 
 \section{Convention used for sending and receiving frames}
@@ -273,6 +330,8 @@ Note that can\_code\_identifier\_pd(...) and can\_decode\_identifier\_pd(...) ar
 %explicar cómo interpretar valores de sensores.
 
 \chapter{Sensor data handler}
+\label{chap:sensorDH}
+
 \section{Overall functionality}
 
 \section{Implementing modes}
@@ -280,399 +339,20 @@ Note that can\_code\_identifier\_pd(...) and can\_decode\_identifier\_pd(...) ar
 \section{Real-time implementation}
 %al final decir que funciona ya independientemente como un sólo internal controller.
 
-\chapter{MuRoX}
+\chapter{MuRoX board}
+\label{chap:reflective}
+
 \section{Compiling for MuRoX}
 
 \section{Example application}
 \label{sect:example}
 
-\chapter{Matlab}
 \section{Compiling from Simulink for MuRoX}
 
 \chapter{Results}
 \section{AMiRo vs. DAEbot}
 
 \section{Outlook}
-
-\iffalse
-The DAEbot which stands for Distributed Architectures Evaluation Robot, is part of the Ph.D. student Uwe Jahn's project. The DAEbot by itself has the objective of testing different approaches for distributed software and hardware architectures \cite{DAEbot_Wiki}. The robot was designed with the goal of having a modular platform and therefore, the hardware is also easily interchangeable for adapting to different software distributions or different applications\cite{DAEbot_Wiki}.
-
-The DAEbot works according to a OCM \cite{ocmAuto} software architecture where there are three basic controllers: Internal Controller, Reflective Operator, and Cognitive Operator. In order to have a more precise overview of how these three controllers work in the DAEbot, figure \ref{fig:ocm} is explained by a direct quote from the Wiki:
-
-\say{Refering to figure \ref{fig:ocm}, the Controllers (red) are used to connect all sensors and actuators. The Controllers need to be configured and programmed once, so the software on the controllers is mostly fixed and does not need to be flexible. The Reflective Operator(s) (yellow) control the Controllers. The Reflective Operator's software is the adaptable part of the distributed system - it changes from application to application. These Operator Controller Module(s) are located on the robot itself and let it act autonomously. The Cognitive Operator is hosted on a server and is used to optimize, program and interact with the user. The Cognitive Operator is connected via a wireless connection and can (only) interact with the Reflective Operator(s).}\cite{DAEbot_Wiki}.
-
-\begin{figure}[h!t]
-	\centering
-	\includegraphics[width=\textwidth]{ocm}
-    \caption{OCM software arquitecture for the DAEbot\cite{DAEbot_Wiki}.}
-    \label{fig:ocm}
-\end{figure}
-\clearpage
-
-
-
-
-\chapter{Hardware Drivers}
-The used hardware was a STM32F3DISCOVERY board which among other features, has:
-\begin{itemize}
-\item Gyroscope, available through a SPI interface (part no. L3GD20).
-\item Accelerometer, available through a SPI or I2C interface (part no. LSM303DLHC).
-\item Magnetometer, which is a part of the Accelerometer part (part no. LSM303DLHC).
-\item CAN module, which outputs a CANtx and CANrx that can be then connected to an external CAN module that transforms the signal into CAN high/low.
-\item GPIO pins that were used in this project as LEDS for debugging, and also for the ultrasonic sensors. The details about the ultrasonic sensors can be obtained in section \ref{sect:ultras}.
-\end{itemize}
-
-\section{Internal STM32F3 sensors}
-This section covers the configuration used and needed to successfully communicate with the peripherals employed in this project.
-
-The corresponding codes for this section can be found in the following project paths:
-\begin{itemize}
-\item \textit{DAEbot/Peripheral-Drivers/DAEbot-PD/STM32F3Drivers/InternalSensors}, where the files for the internal sensors which contains configuration and handling of gyroscope, accelerometer, and magnetometer can be found.
-\item \textit{DAEbot/Peripheral-Drivers/DAEbot-PD/STM32F3Drivers/UltrasonicSensors}, where the files for the configuration and handling of the ultrasonic sensors can be found.
-\item \textit{DAEbot/Peripheral-Drivers/DAEbot-PD/ControllerAreaNetwork}, where the files for the configuration and handling of the CAN communication can be found under the macro \#ifdef STM32F3\_DAEbot.
-\item \textit{DAEbot/Devices/Internal\_Robot\_CTRL}, where the main implementation of the project is being done. Here is the code that uses the configuration files mentioned above and handles the FreeRTOS task scheduling.
-\end{itemize}
-
-The gyroscope, accelerometer, and magnetometer are communicated via SPI and I2C. The configuration of them has to be as follows:
-
-Configuration for the SPI:
-\begin{itemize}
-\item Mode: master.
-\item Direction: 2 lines.
-\item Clock polarity: low.
-\item Baud rate prescaler: 16
-\item Polynomial for CRC calculation: 7
-\end{itemize}
-
-Configuration for the I2C:
-\begin{itemize}
-\item Timing register value = 0x00902025.
-\item Own address: 0.
-\item Addressing mode: 7 bit.
-\end{itemize}
-
-\subsection{Gyroscope}
-The gyroscope part is called L3GD20\cite{gyroscopepart}, this sensor is communicated with the processor via SPI. To initiate the sensor it is necessary to enable the desired axis writing a 0xCF to the 0x20 address registry (CTRL\_REG1) which corresponds to enabling all the axis and setting a 760Hz frequency.
-
-In order to obtain data from the gyroscope and have it back in the processor, the address 0x27 is transmitted to the gyroscope and the gyroscope will output the data from the three axis in a 64-bit per axis fashion. To accomplish this, the gyroscope has a low part of 32 bits and a high part of 64 bits for each axis in the following manner:
-
-\begin{itemize}
-\item Coordinate "x\_low" 0x28
-\item Coordinate "x\_high" 0x29
-\item Coordinate "y\_low" 0x2A
-\item Coordinate "y\_high" 0x2B
-\item Coordinate "z\_low" 0x2C
-\item Coordinate "z\_high" 0x2D
-\end{itemize}
-To normalize the output the following conversion was used:
-
-\begin{equation} \label{eq:gyroscope}
-	result = \frac{value * mdpsperdigit}{1000}
-\end{equation}
-
-Where the value is the raw number received from the peripheral and mdps per digit is a fixed value of 8.75 which calibrates the gyroscope and outputs a value in revolutions per second.
-
-\subsection{Accelerometer}
-The accelerometer part is called LSM303DLHC\cite{accelerometerpart}, this sensor is communicated with the processor via I2C. To initiate the sensor it is necessary to enable the desired axis writing to the 0x20 address registry (CTRL\_REG1\_A) a 0x57 which corresponds to enabling all the axis and setting  a low-power mode of 100Hz.
-
-In order to obtain data from the accelerometer and have it back in the processor, the address 0x27 is transmitted to the accelerometer which has a slave address of 0011001. Afterwards the accelerometer will output the data from the three axis in a 64-bit per axis fashion. To accomplish this, the accelerometer has a low part of 32 bits and a high part of 64 bits for each axis in the following manner:
-
-\begin{itemize}
-\item Coordinate "x\_low" 0x28
-\item Coordinate "x\_high" 0x29
-\item Coordinate "y\_low" 0x2A
-\item Coordinate "y\_high" 0x2B
-\item Coordinate "z\_low" 0x2C
-\item Coordinate "z\_high" 0x2D
-\end{itemize}
-
-To normalize the output the following conversion was used:
-
-\begin{equation} \label{eq:accelerometer}
-	result = \frac{value * 4 * g}{65535}
-\end{equation}
-
-Where the value is the raw number received from the peripheral and g is the acceleration of gravity $9.81 \frac{m}{s^2}$. The resulting value will be also in $\frac{m}{s^2}$ units.
-
-\subsection{Magnetometer}
-The magnetometer part is the same as the accelerometer: LSM303DLHC\cite{accelerometerpart}, this sensor is communicated with the processor also via I2C. To initiate the sensor it is necessary to enable the desired axis writing to the 0x00 address registry (CTRL\_REG1\_M) a 0x3C which corresponds to configure the minimum data output rate to 220Hz. Also, the address 0x02 is written with a 0x00 to specify that the data conversion mode must be continuous.
-
-In order to obtain data from the magnetometer and have it back in the processor, the slave address of the magnetometer 0011110x is sent via I2C to the peripheral. The x is a write/read bit so for the purpose of receiving the data from the magnetometer a 0x3c has to be sent. Afterwards the magnetometer will output the data from the three axis in a 64-bit per axis fashion. To accomplish this, the magnetometer has a low part of 32 bits and a high part of 64 bits for each axis in the following manner:
-
-\begin{itemize}
-\item Coordinate "x\_low" 0x03
-\item Coordinate "x\_high" 0x04
-\item Coordinate "y\_low" 0x05
-\item Coordinate "y\_high" 0x06
-\item Coordinate "z\_low" 0x07
-\item Coordinate "z\_high" 0x08
-\end{itemize}
-
-To normalize the output the following conversion was used:
-
-\begin{equation} \label{eq:magnetometer}
-	result = value * 1.22
-\end{equation}
-
-Where the value is the raw number received from the peripheral and mdps per digit is a fixed value of 8.75 which calibrates the gyroscope, outputing a value in gauss units.
-
-\section{Ultrasonic sensors}
-\label{sect:ultras}
-The four ultrasonic sensors are connected via GPIO. Each ultrasonic sensor has four pins: 5V input, ground, trigger pin, and echo pin. The final layout of the pins can be seen in table \ref{tab:ultras}.
-\begin{table}[h!]
-\centering
-\begin{tabular}{l|c|c}
-Ultrasonic sensor & Trigger pin & Echo pin \\\hline
-1st	&	PC2		&	PC3		\\
-2nd	&	PD10	&	PD11	\\
-3rd	&	PB10	&	PB11	\\
-4th	&	PB2		&	PE7
-\end{tabular}
-\caption{\label{tab:ultras}Ultrasonic sensors mapping to STM32F3DISCOVERY}
-\end{table}
-
-For each ultrasonic sensor the reading process is the following:
-\begin{enumerate}
-\item Write trigger pin a '0'.
-\item wait for 2 $\mu s$
-\item Write trigger pin a '1'.
-\item wait for 10 $\mu s$
-\item Write trigger pin a '0'.
-\item Wait for a response in the echo pin.
-\item Count time the echo pin is being written with '1'.
-\item Normalize the output.
-\end{enumerate}
-
-To normalize the output the following conversion was used:
-
-\begin{equation} \label{eq:ultras}
-	distance = \frac{time\_in\_'1'}{58-20}
-\end{equation}
-Where the distance variable is the distance in cm from the ultrasonic sensor to an object.
-
-Note: for the timing tasks, the vtaskDelay() of FreeRTOS function was used, taking into consideration that the clock frequency is set to 1MHz. This is why the function readUltrasonic() of the ultrasonic.c code can only be called from within a FreeRTOS task.
-
-\section{CAN module}
-The STM32F3DISCOVERY has a Controller Area Module interface in digital output. The assigned pins in the board are assigned as follows:
-
-\begin{table}[h]
-\center
-\begin{tabular}{c|c}
-CAN interface & Pin \\\hline
-CANrx\_0	&	PA11		\\
-CANtx\_0	&	PA12		\\
-CANrx\_1	&	PB8			\\
-CANtx\_1	&	PB9			\\
-CANrx\_2	&	PD0			\\
-CANtx\_2	&	PD1
-\end{tabular}
-\caption{\label{tab:pinCAN}CAN interfaces mapping to STM32F3DISCOVERY}
-\end{table}
-
-The chosen pins for the CAN module in this project were PD0 and PD1 as these are the pins which are hard-wired in the expansion board the STM32F3DISCOVERY board is being mounted. In order to use the CAN module, said GPIO pins have to be configured in the following fashion:
-\begin{itemize}
-\item Alternate function push pull mode.
-\item Nor pull-up or pull-down.
-\item High frequency mode.
-\item CAN alternate function which according to the HAL drivers, is the value 0x07.
-\end{itemize}
-
-With the pins initialized, the CAN module was configured as follows.
-
-\begin{itemize}
-\item Normal mode.
-\item Maximum time quanta = 1.
-\item time quanta in bit segment 1 = 2.
-\item time quanta in bit segment 2 = 3.
-\item Prescaler of 8.
-\item CAN filter in ID mask mode.
-\item CAN filter scale of 32 bit.
-\end{itemize}
-
-The baud rate requirement of the CAN project was set to 500kHz. This frequency was achieved with the following equation:
-
-\begin{equation} \label{eq:baudrate1}
-	500kHz= \frac{24MHz}{(B1+B2+SW)*prescaler}
-\end{equation}
-
-Where the 24MHz is the clock frequency of the STM32F3 for the CAN module, the B1 and B2 are the time quanta bit segment one and two accordingly. Finally, the SW represents the maximum time quanta.
-
-In order to accomplish this frequency a process of trial and error was conducted, given that the equation \ref{eq:baudrate1} has four unknown values. Firstly a 32 prescaler was set and the time quantas were made one variable which as so: $B1 + B2 + SW = TQ$. This resulted into the next equation:
-
-\begin{equation} \label{eq:baudrate2}
-	500kHz= \frac{24MHz}{(TQ)*8}
-\end{equation}
-
-And so,
-
-\begin{equation} \label{eq:baudrate3}
-	TQ = 6
-\end{equation}
-
-With this result the values of the time quantas can be assigned, taking into consideration that a value of 0 in any of this variables did not work as expected. So taking into consideration equation \ref{eq:baudrate4} the assignments were conducted as follows: $SW=1$ $B1=2$ $B2=3$.
-
-\begin{equation} \label{eq:baudrate4}
-	6 = B1+B2+SW
-\end{equation}
-
-And so the initialization of the peripherals has been exposed, also the functionality of the internal sensors have been explained. The functionality of the CAN interface, however, will be explained in the next chapter.
-
-\chapter{CAN interface}
-This chapter explains how to receive and transmit CAN frames in the STM32F3DISCOVERY board. The functionality of the CAN module of the STM32 board had to be merged with the current ControllerAreaNetwork.c and .h that other instances of the DAEbot project area already using.
-
-It is important to take into consideration that the format of the CAN frames was done accordingly with the pre-established DAEbot project. See figure \ref{fig:can}
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{can_structure}
-    \caption{Pre-established CAN frame format}
-    \label{fig:can}
-\end{figure}
-
-\section{Functionality of Controller AreaNetwork.c /.h}
-
-Upon the transmission of a CAN frame, the id is coded according to figure \ref{fig:can} and when a CAN frame is received, the id is decoded into the same structure. The CAN frame pre-established structure can be seen in snip of code \ref{CAN:frame}, which can be compared with the figure \ref{fig:can}.
-
-\begin{lstlisting}[caption = CAN frame, label = CAN:frame]
-typedef struct can_frame_types {
-	priority_can_id_t priority_id;
-	c_s_bit_can_id_t c_s_bit_id;
-	topic_can_id_t topic_id;
-	uint8_t dlc;
-	uint8_t data[8];
-} can_frame_types_t;
-\end{lstlisting}
-In order to send a CAN frame, can\_transmit\_data\_frame\_pd(...) can be called. When sending a CAN frame, the id is set to be in standard mode. The CAN frame that is sent consists of three main parts: id, DLC, and the data. The id is therefore set with the can\_code\_identifier\_pd(...) function before actually calling the transmit function. This function combines the c\_s bit with the priority bit and then combines that value to the topic ID. The CAN frame is sent with the function HAL\_CAN\_Transmit(...) with a timeout of 10ms. The user can see the status of the CAN transmission: Transmission ok, transmission timeout, or transmission error.
-
-On the CAN reception side, the status of the reception is assigned when calling to the can\_receive\_data\_frame\_pd(...) function. The status of the CAN reception can be successful, timeout, or error. Then the id of the CAN frame gets decoded with the function can\_decode\_identifier\_pd(...) and the data frames are passed into a global structure like in snip of code \ref{CAN:frame}
-
-Note that can\_code\_identifier\_pd(...) and can\_decode\_identifier\_pd(...) are functions that were already implemented beforehand, for this project it was necessary to adjust both functions to operate with the current hardware platform.
-
-\chapter{Sensor-Data Handler}
-\label{chap:sensor}
-SensorDataHandler.c and SensorDataHanlder.h have the implementation of the scheduler and the handling of the transmission and reception of the CAN frames are implemented. These files include internal\_sensors, ultrasonic, and ControllerAreaNetwork as seen in figure \ref{fig:class}.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{class}
-    \caption{Overview of sources implementation}
-    \label{fig:class}
-\end{figure}
-
-This code starts to run as soon as the main class calls for the initHardware() function which starts the first FreeRTOS task dedicated to poll for an incoming CAN frame every 10ms. As long as there is no incoming CAN frame the status of the CAN reception will be timeout. When a CAN frame is received the status changes for that cycle to ok which starts the logic of the reception part. This logic is as follows: Upon successful reception of a CAN frame, the c\_s\_bit is checked to see if the CAN frame needs a sensor data. If this is the case, the mode of the transmission will be set. The mode is read from the first data byte of the CAN frame and can be:
-
-\begin{itemize}
-\item '0' for no transmission. This mode stops the transmission of the requested sensor.
-\item '1' for publisher mode. This mode starts a transmitting FreeRTOS task according to the parameters of the second and third data bytes from the CAN frame.
-\item '2' for the one time transmission mode. This mode requests only one transmission of a sensor data, regardless and without altering the previous tasks configuration.
-\end{itemize}
-This modes were set before starting with this project and a brief overview can be inferred by figure \ref{fig:canmodes}
-Further explanation of the modes changes and their implementation will be done in the upcoming section.
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{modes}
-    \caption{Modes requested implementation}
-    \label{fig:canmodes}
-\end{figure}
-
-\section{Implementing Modes}
-As discussed before, there are three main modes: no transmission, publisher, and one time transmission. This functionality was implemented with a state machine of those three stages. The behavior can be seen in figure \ref{fig:states}.
-
-The first mode is the no transmission mode. When a CAN frame is received requesting this mode, the CAN frame id is decoded and the topic id of the requested sensor is identified so the FreeRTOS task that was sending its information gets deleted.
-
-The second mode is the publisher mode. In this mode the data from bytes 1 and 2 are decoded taking into consideration figure \ref{fig:canmodes}, which means that the first byte will serve as the time value and the second byte as the requested unit of time. It is important to note that the received data is in bits format which means that the value has to be parsed into an integer first.
-
-Once the time constraint has been set, the next step is to check if the requested sensor is already sending CAN frames with a different frequency. If this is the case, that task will be deleted and replaced with the new one. The FreeRTOS task is then created with the time constraint as a period of time in which the task will be sending data. The rest of the time the task is not sending information, it sleeps itself and wakes up with a relative timer that is set each time the system powers on.
-
-The third mode is the one time transmission mode. In this mode, the requested sensor data will be sent once regardless and without altering the previous tasks configuration.
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{states}
-    \caption{Modes implementation}
-    \label{fig:states}
-\end{figure}
-
-\section{Real-time implementation}
-\label{sect:realtime}
-For the real-time implementation certain factors had to come into consideration: the maximum heap size that the FreeRTOS can spare for its tasks, preemption of the tasks so that each task fulfills its deadline, and the priority of each task which contributes to the preemption decision.
-
-Fortunately the preemption of the tasks is done by the FreeRTOS system and the only configuration needed was to turn on the the preemptive functionality and base it on priorities. The priorities of FreeRTOS work backwards as the DAEbot project was establishing. In FreeRTOS the lowest priority is the '0' and it grows accordingly. In the DAEbot project it is established that the highest priority has to be '0' so a normalization had to be done. This job is being done by the function priorityHandler().
-
-The number of possible sending tasks at the same time was set to four. This decision was done with the intention of leaving some free heap of the FreeRTOS maximum heap size configuration for the other sensors and actuators that must be a part of this project and are not ready as of the date of this document: motors and motor encoders. So if there are four sending tasks being executed and the board gets a request for sending a fifth sensor value, this fifth sensor value will not be taken into consideration until one of the previous tasks gets deleted by the user using mode 0.
-
-An example application of the system can be appreciated in figure \ref{fig:timing}, where an example situation is shown.The example was considered as follows:
-
-\begin{enumerate}
-\item At 30ms the reception task receives a CAN frame requesting a gyroscope 'x' value every 20ms.
-\item At 50ms the reception task receives a CAN frame requesting a accelerometer 'z' value every 10ms.
-\item At 70ms the reception task receives a CAN frame requesting a ultrasonic sensor \#2 value one time.
-\item At 90ms the reception task receives a CAN frame requesting the ultrasonic sensor \#1 value every 10ms.
-\item At 110ms the reception task receives a CAN frame requesting the gyroscope 'x' value to stop being transmitted.
-\item At 150ms the reception task receives a CAN frame requesting the magnetometer 'y' value every 30ms.
-\item At 170ms the reception task receives a CAN frame requesting the ultrasonic sensor \#3 value every 10ms.
-\item At 210ms the reception task receives a CAN frame requesting the ultrasonic sensor \#1 value to stop being transmitted.
-\end{enumerate}
-
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[ width=18cm, height = 10cm, angle = 90]{timing}
-  	\caption{Example requests}
-  	\label{fig:timing}
-\end{figure}
-
-\chapter{Results}
-The project was successfully compiled and flashed into the STM32F3 DISCOVERY board. For testing, a CAN-USB interface was used to monitor the CAN low and high signals. The testing case was similar to the one shown in section \ref{sect:realtime}. This test is shown in figures \ref{fig:res2} and \ref{fig:res1}. In \ref{fig:res2} the different CAN frames to be sent are shown. It is important to note that the protocol for the CAN frames to be sent is being followed according to figure \ref{fig:canmodes}. The next process was followed:
-
-\begin{figure}[ht]
-	\centering
-	\includegraphics[width=\textwidth]{results_2}
-    \caption{CANalyzer configuration.}
-    \label{fig:res2}
-\end{figure}
-
-\begin{enumerate}
-\item The board receives a request for sending gyroscope 'x' (ID equal to 0x21E) values every two seconds.
-\item The board receives a request for sending accelerometer 'z' (ID equal to 0x223) values every second.
-\item The board receives a request for sending ultrasonic sensor \#1 (ID equal to 0x227) values every second.
-\item The board receives a request for stopping sending gyroscope 'x' (ID equal to 0x21E) values.
-\item The board receives a request for sending a one time gyroscope 'z' (ID equal to 0x220) value.
-\item The board receives a request for sending magnetometer 'y' (ID equal to 0x225) values every three seconds.
-\item The board receives a request for sending ultrasonic sensor \#3 (ID equal to 0x229) values every second.
-\item The board receives a request for stopping sending ultrasonic sensor \#1 (ID equal to 0x227) values.
-\end{enumerate}
-
-Note that the ID's are given by setting the c/s bit to sensor data according to figure \ref{fig:can}, but also using the ID assigned to each sensor according to the Wiki\cite{DAEbot_Wiki}. Also note that the STM32F3DISCOVERY board receives a 0x2'xx' where xx represent the topic id but the '2' indicates that a command is being requested with normal priority, i.e. '010'. The sensor data is then sent with the same topic id but with a '6' instead which means that the CAN frame represents a sensor data with normal priority, i.e. '110'.
-
-\begin{figure}[ht]
-	\caption{CAN results}
-	\centering
-	\includegraphics[ width=\textwidth, height = \textheight]{results}
-  \label{fig:res1}
-\end{figure}
-
-The results are shown in figure \ref{fig:res1}. The average error was of +/-100ns. There were also few bigger errors, the maximum error registered was about 10ms. It is important to mention that these 'big' errors occurred right when there was a reception of a new CAN frame asking for a new sensor data. When there is no new request, the error remains within +/-100ns.
-
-Considering the previous results, it can be said that the overall system is capable of the following:
-
-\begin{enumerate}
-\item Access the gyroscope, accelerometer, and magnetometer sensors, as well as the four ultrasonic sensors and obtain the data mapped to real values.
-\item Send and receive CAN frames.
-\item Use the protocol established in the requirements of the DAEbot with respect of the CAN frames, which means that the frames are coded and decoded according to the protocol.
-\item Handling of the received CAN frames and being able to separate between the required modes, no transmission, publisher, and one time transmission.
-\item Use a real-time operating system to manage the required scheduler which manages to fulfill the deadlines with a high accuracy.
-\end{enumerate}
-
-\section{Outlook}
-The project has certain parts where the implementation can be improved in terms of robustness and scalability of number of parallel tasks. For one, the project uses a polling system with the FreeRTOS system, this means that the overall system is parallelized but it is paying a little cost of waiting for timeouts in the reception task, which even thought are small, i.e 100ns - 1ms can result in a loss of accuracy when expecting a result in under this time constraint.
-
-It can be said that the real-time system is working as expected: meeting deadlines and not loosing packages. The error range for this purposes discussed in the previous section is still small enough to make the project fulfill the requirements of a soft real-time system.
-
-As a possible future work the reception and sending of the CAN frames can be done with interruptions so that even less time is consumed in context switching. This would improve both, the capability of maximum number of tasks as well as the robustness of the system. This however, has to be done once the motors and encoders project for the Internal Controller is finished so that these constraints can be modified and tested in the full extension of the STM32F3DISCOVERY board.
-
-Also there is a possibility of selecting a different clock source in order to make the system go from the fixed 8MHz as the input clock, to 32MHz which can be later scaled by the PLL multiplier. This can be achieved by soldering the corresponding pins directly from the board according to the section 6.10.1 from the STM32F3DISCOVERY User Manual\cite{mcu}.
-\fi
 
 %bibliography
 \printbibliography

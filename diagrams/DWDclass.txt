@@ -1,0 +1,79 @@
+@startuml
+class DiWheelDrive
+class ControllerAreaNetworkRx
+class ControllerAreaNetworkTx
+class Global
+class Accelerometer
+class Gyroscope
+class Magnetometer
+class ProximitySensors
+class Motor
+class Odometry
+
+ControllerAreaNetworkRx <|-- DiWheelDrive
+ControllerAreaNetworkTx <|-- DiWheelDrive
+Global *- "1" DiWheelDrive
+Global *-- "1" Accelerometer
+Global *-- "1" Gyroscope
+Global *-- "1" Magnetometer
+Global *---- "4" ProximitySensors
+Global *- "2" Motor
+Global *-- "1" Odometry
+
+class DiWheelDrive {
++extern Global global
+
+    +virtual msg_t updateSensorVal()
+    +virtual void setMotor(vel_1, vel_2)
+    +virtual void magnetometerSend(priority)
+    +virtual void gyroscopeSend(priority)
+    +virtual void accelerometerSend(priority)
+    +virtual void odometrySend(priority)
+    +virtual void proximitySend(priority)
+    +virtual void proximityRingSend(priority) = 0
+    +virtual void powerStatusSend(priority) = 0
+    +virtual void commandLights(light_id, red, green, blue) = 0
+}
+
+class ControllerAreaNetworkTx {
++virtual msg_t updateSensorVal()
++void can_transmit_data_frame_pd(*can_frame_types)
++uint16_t can_code_identifier_pd(*priority_can_id, *c_s_bit_can_id, *topic_can_id)
+#virtual msg_t updateSensorVal() = 0
+#virtual void setMotor(vel_1, vel_2) = 0
+#virtual void magnetometerSend(priority) = 0
+#virtual void gyroscopeSend(priority) = 0
+#virtual void accelerometerSend(priority) = 0
+#virtual void odometrySend(priority) = 0
+#virtual void proximitySend(priority) = 0
+#virtual void proximityRingSend(priority) = 0
+#virtual void powerStatusSend(priority) = 0
+#virtual void commandLights(light_id, red, green, blue) = 0
+}
+
+class ControllerAreaNetworkRx {
++extern Global global
++can_frame_types_t receivedCAN
+#uint16_t proximityRingValue[8]
+#int actualSpeed[2]
+#uint16_t proximityFloorValue[4]
+#int32_t magnetometerValue[3]
+#int16_t gyroscopeValue[3]
+#int16_t accelerometerValue[3]
+#can_frame_types_t can_decode_identifier_pd(canid)
++can_frame_types_t can_receive_data_frame_pd(*frame)
+}
+
+class Global{
++Accelerometer accelerometer
++Gyroscope gyroscope
++Magnetometer magnetometer
++array<Motor, 2> motor
++Odometry odometry
++array<ProximitySensors, 4> proximitySensors
++MotorIncrements increments
++MotorControl motorcontrol
++Odometry odometry
++DiWheelDrive robot
+}
+@enduml
