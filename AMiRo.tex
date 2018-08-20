@@ -1,4 +1,6 @@
 %IMPORTANT!!!!!! remember to abilitate twoside, openright to print document.
+%remember the clearpages for editing better.
+
 \documentclass[12pt]{report}%, twoside, openright]{report}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
@@ -50,6 +52,8 @@ Uwe Jahn
 \end{titlepage}
 \pagenumbering{roman}
 \tableofcontents
+\listoffigures
+\listoftables
 
 \begin{abstract}
 This work covers most of the internal controller required functionality assigned to the DA\_AMiRo project. The architecture of the AMiRo is briefly discussed and it is then explained how the three boards of the AMiRo talk to each other. Some other sensors are explained, and the Communication Area Network module. All these functionalities are incorporated in the sensor data handler which is explained later. Every piece of code described in the present report is part of the DA\_AMiRo project and the reader can go to the gitlab repository and the Wiki page for more information. One of the purposes of the DA\_AMiRo project is to compare its functionality with the DAEbot project conducted by Uwe Jahn. The reader can read all about the DAEbot's internal controller in the previous student's work \cite{DAEBot_internal}. This work will finalize with a comparison on both systems.
@@ -235,6 +239,7 @@ The structure of the AMiRo Operating System, including the files that are being 
 
 %Quizás algo más a cerca de AMiRo (apps, applicaciones pensadas, demos....)
 
+%\clearpage
 \subsection{DA\_AMiRo software structure}
 From the past sections the hardware and software structure of the AMiRo was mentioned and briefly discussed. From this point forward the structure and functionality of the DA\_AMiRo project will be discussed as it is the central point of the master thesis. As a friendly reminder, the reader can obtain the source codes made for the DA\_AMiRo project from the repository \cite{AMiRo_Git}.
 
@@ -328,11 +333,13 @@ On the CAN reception side, the status of the reception is assigned when calling 
 
 Note that can\_code\_identifier\_pd(...) and can\_decode\_identifier\_pd(...) are functions that were already implemented beforehand, for this project it was necessary to adjust both functions to operate with the current hardware platform.
 
+%\clearpage
 \section{Interpreting CAN frames of the sensors}
 \label{sec:sensorout}
 In this section it will be explained how to read the frames corresponding to each sensor. For the same reason, this section is divided into two subsections: sensors and actuators.
 
 \subsection{Sensors}
+\label{sub:sensors}
 In order to interact with a sensor, the id from the CAN frame's command has to obey the convention shown in figure \ref{fig:can} and its content, the actual data from the CAN frame has to follow the convention shown in figure  \ref{fig:sensormodes} created by Uwe Jahn for the DAEbot project.
 
 There are three ways or modes in which a command can ask for data from a sensor. The first one is the mode one which asks for a sensor's data with a specific frequency. The first DLC of the CAN frame has to be set to '1' to activate the publisher mode. The second and third DLCs specify the numeric value of the frequency in format of little-endian. This means that the most significant bit should be a part of the DLC number 2 and the less significant bit should be a part of the DLC number 1. The fourth DLC specify the units of the value given in the second and third DLCs. This value can be obtained looking at figure \ref{fig:sensormodes}.
@@ -517,30 +524,99 @@ The proximity ring will return eight CAN frames one for every sensor there is. E
 There are so far two implemented actuators: the motors and the LEDs. The way of interacting with the sensors will be now described but it is important to note that they will not send anything back to the CAN bus, as they will only 'act'.
 
 \subsubsection{Motors}
-For the motors, the
+The motors can be started with a desired speed in $\mu m/s$ or in an angular speed with $\mu rad/s$ units. See table \ref{tab:setvelocity}. For the id of the motor's actuator please refer to the ControllerAreaNetwork.h file found in \ref{fig:DAAMIROstr}.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|l|}
+	\hline
+	DLC										&	8														\\	\hline
+	size of data					&	32bits											\\	\hline
+	'x' velocity					&	DLC[0] DLC[1] DLC[2] DLC[3]	\\	\hline
+	'z'	angular velocity	&	DLC[4] DLC[5] DLC[6] DLC[7]	\\	\hline
+	units									&	$\mu m/s$ and $\mu rad/s$		\\	\hline
+\end{tabular}
+\caption{\label{tab:setvelocity} CAN frame format for setting the velocity of the motors}
+\end{table}
 
 \subsubsection{LEDs}
+\label{sub:CANleds}
+In order to turn a LED on, the following data structure has to be followed:
 
+\begin{itemize}
+	\item id: Desired LED's id obtainable from the ControllerAreaNetwork.h found in \ref{fig:DAAMIROstr}.
+	\item DLC 0: Red value
+	\item DLC 1: Green value
+	\item DLC 2: Blue value
+\end{itemize}
 
 \chapter{Sensor data handler}
 \label{chap:sensorDH}
+The sensor data handler is the responsible for setting the publisher of sensor's data. The publisher can handle every sensor sending its value at once as they have each a dedicated task in a real-time context. This means that every sensor has its own task assigned to it and said task gets suspended or resumed with the requested frequency according to the commands of the CAN frames.
+
+In figure \ref{fig:sensorclass} the structure of the sensor data handler can be seen as well as its connection with the sensor tasks. All of these tasks get managed by the sensor data instance.
+
+\begin{figure}[ht]
+	\includegraphics[width=15cm]{sensorclass}% 20cm, height = 10cm, angle = 90]{sensorclass}
+  	\caption{SensorDataHandler.cpp and the sensor tasks structure}
+  	\label{fig:sensorclass}
+\end{figure}
 
 \section{Overall functionality}
+The sensor handler is a class which has only once instance and its started in the main class, along with the tasks for all the sensors inside each board. When the task for the sensor handler is started, it polls the CAN reception for a CAN frame that has the C\_S bit set to a '0' which corresponds to a \textit{Command data}, according to fig \ref{fig:can} of section \ref{sec:canconv}.
 
-\section{Implementing modes}
+Whenever the sensor handler detects a CAN frame corresponding to a \textit{Command data}, the CAN frame has to be further analyzed to know if it is trying to communicate with a \textit{sensor} or with an \textit{actuator}.
 
-\section{Real-time implementation}
-%al final decir que funciona ya independientemente como un sólo internal controller.
+\subsection{Sensor data handling}
+Whenever the command corresponds to a sensor, the next step is to read the DLC 0 to know if it is a command for stopping a sensor data, if it is a command for starting a publishing sensor data, or if it is a request for a one time transmission, see figure \ref{fig:sensormodes} from section \ref{sub:sensors}.
+
+The state machine of figure \ref{fig:states} shows how the modes get handled. Whenever the DLC 0 has a '0' corresponding to a \textit{No transmission} is detected, the id from the topic gets identified and the corresponding task gets suspended so it no longer transmits its value.
+
+When the DLC 0 has a '1' corresponding to a \textit{Publisher} is detected, the DLC 1, DLC 2, and DLC 3 get decoded to know the requested frequency from the id of the sensor that needs to start sending its information. If the sensor was already sending information, it needs to update its frequency and the priority, and it gets going.
+
+Finally, when the DLC 0 has a '2' which means that the user wants a \textit{One time transmission} of a sensor data, this value gets sent one time only. If this sensor was sending its value in a publisher, then the task gets suspended.
+
+\begin{figure}[ht]
+ \centering
+ \includegraphics[width=\textwidth]{states}
+		\caption{Modes implementation}
+		\label{fig:states}
+\end{figure}
+
+\subsection{Actuator data handling}
+In the other case, when the command is trying to communicate with an actuator, it goes into a sorter that separates the motor's command from the LEDs' command. If it is a command for the motors, then the motors get set with the velocity requested in the CAN frame. When its a LEDs command, the selected LED gets turn on or changes its color with the \textit{RGB} code reviewed in section \ref{sub:CANleds}.
+
+\subsection{Real-time implementation}
+The tasks corresponding to the sensors can all be operating at once. The priority of the tasks is being handled as preemptive tasks. This means that if two tasks are racing for the processing time, the one with higher priority will be preempted. Also, if one task is asked to output its value at the same frequency as a task that is already outputting its value, the one with higher priority will be on schedule and the one with less priority can be delayed some $\mu s$.
+
+Everything up to this point works as an independent sensor data handler. This means that the internal controller is encapsulated and complete. The only thing that can interact with the functioning system are commands in the CAN bus. For this purpose the MuRox board has to be set and running the Linux based Operating System. See next chapter for more information about how to debug and the functionality of the MuRoX board in general.
 
 \chapter{MuRoX board}
 \label{chap:reflective}
+This board is performing as the Reflective Operator of the system. This board is the one that asks for a certain sensor data from the internal controller or also it can control the actuators. The user can connect to this board through ssh, with the address 192.168.1.1 with password \textit{root}.
+
+The board already has a package called 'candump' which interacts with the CAN module in the board and can be used to debug the internal controller's functionality. The way of sending CAN frames from the MuRoX board has to follow the next convention:
+
+\begin{lstlisting}[caption = CAN send format, label = CAN:debug, captionpos = b]
+cansend can0 --identifier=CANid DLC0 DLC1 DLC2 DLC3 DLC4 ...
+\end{lstlisting}
 
 \section{Compiling for MuRoX}
+\label{sec:poky}
+For creating an application that the MuRoX board can run, it is necessary to use the \textit{cortexa8hf-vfp-neon-poky-linux-gnueabi} version of the cross-compiler. Once the application is compiled, the resulting binaries can be moved into the board using the \textit{scp} command.
+
+\begin{lstlisting}[caption = moving files into MuRoX board \cite{AMiRo_Murox}, label = CAN:debug, captionpos = b]
+scp anyFile root@192.168.0.1:~
+\end{lstlisting}
+
+\section{Compiling from a Simulink model for MuRoX}
+It is intended for a Simulink model to be compiled and programmed into the MuRoX board. For this purpose, the Simulink model gets translated into C code with the help of Matlab's solver. The resulting code has to be passed through the process described in section \ref{sec:poky} so it is compatible with the MuRoX board.
+
+It is worth mentioning that the Simulink model is being done in cooperation but mostly by Uwe Jahn and it is still work in progress.
 
 \section{Example application}
 \label{sect:example}
-
-\section{Compiling from Simulink for MuRoX}
+For testing purposes, a demo application was created. This demo application has a determined functionality and it can be used to test the sensors and the CAN communication between the Reflective Operator and the Internal controller.
 
 \chapter{Results}
 \section{AMiRo vs. DAEbot}

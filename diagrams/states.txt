@@ -1,20 +1,21 @@
 @startuml
-
 [*] -> Idle
 Idle : Wait for next successful CAN frame reception 
 
 Idle -up-> No_transmission :data[0] = 0
-No_transmission : delete the task with the requested topic id
+No_transmission :  Stop the task with the requested topic id
 No_transmission -> Idle : done
 
 Idle  -down-> Publisher :data[0] = 1
-Publisher : 1. Decode data[1] and data[2] to set task frequency
+Publisher : 1. Decode data[1], data[2], and data[3] to set task frequency
 Publisher : 2. If the topic id is the same, replace it with new one
-Publisher : 3. Create a new FreeRTOS transmission task
+Publisher : 3. Resume the transmission task corresponding to topic id
 Publisher -> Idle  : done
 
 Idle -> One_time_transmission  :data[0] = 2
 One_time_transmission : Transmit required sensor data once
+One_time_transmission : If the sensor is currently sending its value, 
+One_time_transmission : stop the task
 
 One_time_transmission -> Idle : done
 @enduml

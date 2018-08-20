@@ -1,0 +1,71 @@
+@startuml
+class SensorDataHandler
+object GyroscopeTask
+object AccelerometerTask
+object MagnetometerTask
+object OdometryTask
+object ProximityTask
+object ProximityRingTask
+object PowerStatusTask
+
+SensorDataHandler o- "1" GyroscopeTask
+SensorDataHandler o- "1" AccelerometerTask
+SensorDataHandler o-- "1" MagnetometerTask
+SensorDataHandler o-- "1" OdometryTask
+SensorDataHandler o-- "1" ProximityTask
+SensorDataHandler o--- "1" ProximityRingTask
+SensorDataHandler o--- "1" PowerStatusTask
+
+class SensorDataHandler {
++extern Global global
+
+-void actuatorSorter(void)
+-void setMode(mode)
+-void taskTurnOff(topic)
+-void taskTurnOn(topic, especific_delay, priority)
+-msg_t sensorDataSend(*frame)
+-int actuatorDiscriminator(topic)
+}
+
+Object GyroscopeTask{
++task_status
++delay
++task_priority
+}
+
+Object AccelerometerTask{
++task_status
++delay
++task_priority
+}
+
+Object MagnetometerTask{
++task_status
++delay
++task_priority
+}
+
+Object OdometryTask{
++task_status
++delay
++task_priority
+}
+
+Object ProximityTask{
++task_status
++delay
++task_priority
+}
+
+Object ProximityRingTask{
++task_status
++delay
++task_priority
+}
+
+Object PowerStatusTask{
++task_status
++delay
++task_priority
+}
+@enduml
