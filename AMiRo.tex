@@ -448,7 +448,7 @@ The four proximity sensors on the bottom of the AMiRo are together in one CAN fr
 \end{table}
 
 \subsubsection{Encoder}
-This sensor returns the 'x' coordinate in $\mu m$ with a size of 32bits, the 'y' coordinate in $\mu m$ with a size of 32bits, and the orientation of the wheels in $\mu rad$ with a size of 16bits. All of these values are together in one CAN frame. See table \ref{tab:encoder}.
+This sensor returns both the actual velocity and the odometry of the AMiRo. The first value will be the actual velocity followed by the odometry. For the odometry, the 'x' coordinate in $\mu m$ with a size of 32bits, the 'y' coordinate in $\mu m$ with a size of 32bits, and the orientation of the wheels in $\mu rad$ with a size of 16bits. All of these values are together in one CAN frame. See table \ref{tab:encoder}.
 
 \begin{table}[h!]
 \centering
@@ -465,7 +465,7 @@ This sensor returns the 'x' coordinate in $\mu m$ with a size of 32bits, the 'y'
 \end{table}
 
 \subsubsection{Actual velocity}
-This id returns the 'x' velocity in $\mu m/s$ with a size of 32bits and the 'z' angular velocity in $\mu rad/s$ also in 32bits. These two values are together in one CAN frame. See table \ref{tab:velocity}.
+The actual velocity will be composed of the 'x' velocity in $\mu m/s$ with a size of 32bits and the 'z' angular velocity in $\mu rad/s$ also in 32bits. These two values are together in one CAN frame. See table \ref{tab:velocity}.
 
 \begin{table}[h!]
 \centering
@@ -616,7 +616,16 @@ It is worth mentioning that the Simulink model is being done in cooperation but 
 
 \section{Example application}
 \label{sect:example}
-For testing purposes, a demo application was created. This demo application has a determined functionality and it can be used to test the sensors and the CAN communication between the Reflective Operator and the Internal controller.
+For testing purposes, three demo applications were created. The first one is called \textit{Demo Sender Reflective Operator} and it is a simple application where the user can send commands to the internal controller. The user is
+
+%explicar el sender
+%explicar el receiver
+%explicar el standalone
+%mencionar de nuevo el metodo de debuggear para un ambiente "más libre y directo"
+
+
+
+The third demo application has a determined functionality and it can be used to test the sensors and the CAN communication between the Reflective Operator and the Internal controller in a standalone application where the user just has to run it and watch the results.
 
 \chapter{Results}
 \section{AMiRo vs. DAEbot}
