@@ -56,7 +56,7 @@ Uwe Jahn
 \listoftables
 
 \begin{abstract}
-This work covers most of the internal controller required functionality assigned to the DA\_AMiRo project. The architecture of the AMiRo is briefly discussed and it is then explained how the three boards of the AMiRo talk to each other. Some other sensors are explained, and the Communication Area Network module. All these functionalities are incorporated in the sensor data handler which is explained later. Every piece of code described in the present report is part of the DA\_AMiRo project and the reader can go to the gitlab repository and the Wiki page for more information. One of the purposes of the DA\_AMiRo project is to compare its functionality with the DAEbot project conducted by Uwe Jahn. The reader can read all about the DAEbot's internal controller in the previous student's work \cite{DAEBot_internal}. This work will finalize with a comparison on both systems.
+This work covers most of the internal controller required functionality assigned to the DA\_AMiRo project. The architecture of the AMiRo is briefly discussed and it is then explained how the three boards of the AMiRo talk to each other. Some other sensors and communication protocols are explained like the Communication Area Network module. All these functionalities are  being administrated in the sensor data handler which is explained later. Every piece of code described in the present report is part of the DA\_AMiRo project and the reader can go to the gitlab repository and the Wiki page for more information. One of the purposes of the DA\_AMiRo project is to compare its functionality with the DAEbot project conducted by Uwe Jahn. The reader can read all about the DAEbot's internal controller in the previous student's work \cite{DAEBot_internal}. This work will finalize with a comparison on both systems.
 \end{abstract}
 \pagenumbering{arabic}
 
@@ -82,14 +82,14 @@ Some of the main characteristics of a RTOS are the following:
 
 \section{Operator Controller Module}
 
-The DA\_AMiRo is inteded to work according to an OCM \cite{ocmAuto} software architecture similar to the one DAEbot was implemented with. In this structure there are three basic controllers: Internal Controller, Reflective Operator, and Cognitive Operator. In order to have a more precise overview of how these three controllers work in the DAEbot, figure \ref{fig:ocm} is explained by a direct quote from the Wiki:
+The DA\_AMiRo Operating System is inteded to be compared to the OCM \cite{ocmAuto} software architecture approach the DAEbot is using. In this structure there are three basic controllers: Internal Controller, Reflective Operator, and Cognitive Operator. In order to have a more precise overview of how these three controllers work in the DAEbot, figure \ref{fig:ocm} is explained by a direct quote from the Wiki:
 
-\say{Refering to figure \ref{fig:ocm}, the Controllers (red) are used to connect all sensors and actuators. The Controllers need to be configured and programmed once, so the software on the controllers is mostly fixed and does not need to be flexible. The Reflective Operator(s) (yellow) control the Controllers. The Reflective Operator's software is the adaptable part of the distributed system - it changes from application to application. These Operator Controller Module(s) are located on the robot itself and let it act autonomously. The Cognitive Operator is hosted on a server and is used to optimize, program and interact with the user. The Cognitive Operator is connected via a wireless connection and can (only) interact with the Reflective Operator(s).}\cite{Wiki}.
+\say{Refering to figure \ref{fig:ocm}, the Controllers (red) are used to connect all sensors and actuators. The Controllers need to be configured and programmed once, so the software on the controllers is mostly fixed and does not need to be flexible. The Reflective Operator(s) (yellow) control the Controllers. The Reflective Operator's software is the adaptable part of the distributed system - it changes from application to application. These Operator Controller Module(s) are located on the robot itself and let it act autonomously. The Cognitive Operator is hosted on a server and is used to optimize, program and interact with the user. The Cognitive Operator is connected via a wireless connection and can (only) interact with the Reflective Operator(s).}\cite{DAEbot_Wiki}.
 
 \begin{figure}[h!t]
 	\centering
 	\includegraphics[width=\textwidth]{ocm}
-    \caption{OCM software arquitecture for the DAEbot\cite{Wiki}.}
+    \caption{OCM software arquitecture for the DAEbot\cite{DAEbot_Wiki}.}
     \label{fig:ocm}
 \end{figure}
 \clearpage
@@ -100,7 +100,7 @@ The second layer is called the reflective operator. It is in this layer where th
 
 The third layer is the Cognitive Operator. On this layer the system gathers information about itself and its environment to improve itself. This recollection of information can be done by applying various methods such as learning and model-based optimization among others. In other words, it is in this layer where the self-improvement takes place \cite{ocmAuto}.
 
-This project focuses on the Controller and Reflective Operator of the AMiRo. The controller is the responsible for commanding the internal sensors of the STM32F32 boards inside AMiRo in real-time. This sensor information is then retrieved by the Reflective Operator with a demo application that will be explained later in this document inside section \ref{sect:example}.
+This project compares the Controller of the DAEbot with the Controller of the DA\_AMiRo, and Reflective Operator of DAEbot to the Cognition board of DA\_AMiRo. The controller is the responsible for commanding the internal sensors of the STM32F32 boards inside DA\_AMiRo in real-time. This sensor information is then retrieved by the Cognition board with a demo application that will be explained later in this document inside section \ref{sect:example}.
 
 \section{AMiRo}
 The AMiRO project, which stand for Autonomous Mini Robot was started in the University of Bielefeld by Stefan Herbrechtsmeier and worked by Thomas Schöpping in collaboration with few others. The motivation for this project was to use small embedded systems in order to create a small robot that is easy to transport, usable on a table or the floor, appealing for young people, that is created with a modular approach is able to be extendable and customizable. With all of these aspects in mind, the result should be also a powerful tool for research and education \cite{AMiRo_ppt_v1}.
@@ -184,7 +184,7 @@ The Light Ring board is the top-most board in the AMiRo. This board has a STMicr
 
 \subsection{Cognition Board}
 \label{sub:cogn}
-This board was thought as an extension board which is no longer from the basic set of boards that make the AMiRo. The Cognition board in this project is being used as the Reflective Operator according to the OCM model. It provides all of the high-level tasks, gathering and coordinating the information generated in the three basic boards also known as the internal controller \cite{AMiRo_paper_modular}.
+This board was thought as an extension board which is no longer from the basic set of boards that make the AMiRo. The Cognition board in this project is being compared with the Reflective Operator of the DAEbot project according to the OCM model. It provides all of the high-level tasks, gathering and coordinating the information generated in the three basic boards also known as the internal controller \cite{AMiRo_paper_modular}.
 
 The most important feature of this board is the attached Gumstix Overo Computer-on-Module. In the current setup, the Overo TidalSTORM COM is being used, which combines an ARM Cortex-A8 based DaVinci DM3730 SoC from Texas Instruments \cite{AMiRo_paper_modular}. This board has the same serial programming port as on the three basic boards. It also has a Type A, a micro-AB, and an internal pin header USB interfaces \cite{AMiRo_paper_modular}.
 
@@ -252,9 +252,9 @@ In last section, the AMiRo's Operating System structure was introduced. This Ope
     \label{fig:DAAMIROstr}
 \end{figure}
 
-The configuration files for the three projects are located inside the \textit{Devices} folder which can be visualized in figure \ref{fig:DAAMIROstr}. They configure the QT IDE for each of the three boards, so the user can easily code and create the binary to program the AMiRo's boards. It is also inside this folder where the Reflective Operator is located. The Reflective Operator consists of a simple C code for programming the MuRoX board, but also has a Matlab project responsible for creating an AMiRo's compatible program from a Simulink model. These issues will be discussed further in chapter \ref{chap:reflective}.
+The configuration files for the three projects are located inside the \textit{Devices} folder which can be visualized in figure \ref{fig:DAAMIROstr}. They configure the QT IDE for each of the three boards, so the user can easily code and create the binary to program the AMiRo's boards. It is also inside this folder where the \textit{Reflective Operator} is located. The Reflective Operator consists of a simple C code for programming the MuRoX Cognition board, but also has a Matlab project responsible for creating an AMiRo's compatible program from a Simulink model. These issues will be discussed further in chapter \ref{chap:reflective}.
 
-Inside the \textit{Peripheral-Drivers} the user can find the ControllerAreaNetwork.h responsible of having the structures and all the definitions that are being used by both the Internal Controller corresponding to the three basic boards and the Reflective Operator which is in charge of the MuRoX board. It is also inside this folder that the \textit{sensorhandler.cpp} and \textit{sensorhandler.h} are found. These both files manage the scheduling of the sensor data and they will be discussed in chapter \ref{chap:sensorDH}.
+Inside the \textit{Peripheral-Drivers} the user can find the ControllerAreaNetwork.h responsible of having the structures and all the definitions that are being used by both the Internal Controller corresponding to the three basic boards and the \textit{Reflective Operator} which is in charge of the MuRoX board. It is also inside this folder that the \textit{sensorhandler.cpp} and \textit{sensorhandler.h} are found. These both files manage the scheduling of the sensor data and they will be discussed in chapter \ref{chap:sensorDH}.
 
 Finally, the folder \textit{Documentation} has some of the papers and information that the AMiRo has had since it was created. The reader can go inside this folder for getting more information about the AMiRo. In the other hand, the folder \textit{PusleAT} was created for a future reference and it is still a work in progress.
 
@@ -492,7 +492,7 @@ When the id for the power status is asked, four values are sent within one CAN f
 	charging flag					&	DLC[0]														& '0' for not charging, '1' for charging	\\	\hline
 	state of charge				&	DLC[1] 														&	percentage															\\	\hline
 	time until charge			&	DLC[3] DLC[2] 										&																					\\	\hline
-	time until charge			&	DLC[5] DLC[4] 										&																					\\	\hline
+	power consumption			&	DLC[5] DLC[4] 										&																					\\	\hline
 	units									&	percentage, minutes, $mW$					&																					\\	\hline
 \end{tabular}
 \caption{\label{tab:powerstatus} CAN frame format from the output of the power status}
@@ -593,7 +593,7 @@ Everything up to this point works as an independent sensor data handler. This me
 
 \chapter{MuRoX board}
 \label{chap:reflective}
-This board is performing as the Reflective Operator of the system. This board is the one that asks for a certain sensor data from the internal controller or also it can control the actuators. The user can connect to this board through ssh, with the address 192.168.1.1 with password \textit{root}.
+This board is performing as the \textit{Reflective Operator} of the system. This board is the one that asks for a certain sensor data from the internal controller or also it can control the actuators. The user can connect to this board through ssh, with the address 192.168.1.1 with password \textit{root}.
 
 The board already has a package called 'candump' which interacts with the CAN module in the board and can be used to debug the internal controller's functionality. The way of sending CAN frames from the MuRoX board has to follow the next convention:
 
@@ -616,21 +616,37 @@ It is worth mentioning that the Simulink model is being done in cooperation but 
 
 \section{Example application}
 \label{sect:example}
-For testing purposes, three demo applications were created. The first one is called \textit{Demo Sender Reflective Operator} and it is a simple application where the user can send commands to the internal controller. The user is
+For testing purposes, three demo applications were created. These three applications are already inside the MuRoX board, but the user can modify the source code which is obtainable from the DA\_AMiRo git repository \cite{AMiRo_Git}. The modified versions of the source code can be compiled and uploaded to the MuRoX board using the method already described in section \ref{sec:poky}.
 
-%explicar el sender
-%explicar el receiver
+The first one is called \textit{Demo Sender Reflective Operator} and it is a simple application where the user can send commands to the internal controller with assistance of a set of menus. The application asks for the priority, the topic id, the mode to be set, and all the needed fields for each case. It also separates actuators from sensors. This application facilitates the sending of commands, because the user does not have to memorize the topic ids or the CAN frame conventions.
+
+The second application is called \textit{Demo Receiver Reflective Operator} and it is basically a thread that outputs the information that the CAN bus receives corresponding to the sensors. The idea behind these two applications is that the user runs both at the same time to send commands and to see how they are being answered.
+
+The third application is called \textit{Demo Standalone Reflective Operator}. It has a determined functionality so the user needs only to run it in order to see its results. This Demo has a set of commands to be sent to the internal controller and shows the outputs of the sensors. The functionality will be
+
 %explicar el standalone
-%mencionar de nuevo el metodo de debuggear para un ambiente "más libre y directo"
+%poner imágenes de cada applicación demo...
 
-
-
-The third demo application has a determined functionality and it can be used to test the sensors and the CAN communication between the Reflective Operator and the Internal controller in a standalone application where the user just has to run it and watch the results.
+Lastly, the user can also send independent CAN frames using the candump package installed in the MuRoX board, as it was already discussed in chapter \ref{chap:reflective}. For this method, the user has to decode previously the topic id and the CAN data frames according to images \ref{fig:can} and \ref{fig:sensormodes}.
 
 \chapter{Results}
+In this chapter the structure and functionality of both projects DA\_AMiRo and DAEbot are compared. As it was intended, this project will help to improve the behavior, structure, and functionality of the DAEbot. Through a brief analysis, some recommendations for the DAEbot project are made for future work.
+
 \section{AMiRo vs. DAEbot}
+%Aquí van los resultados, imágenes de resultados y explicación.
+
+
+
+In a quick glance at the results, the DA\_AMiRo seems to be slightly better in functionality. The results in DAEbot have a 100ns - 1ms timeouts inaccuracy which compared to the approximate 10ns timeouts for the DA\_AMiRo are for starters a big disadvantage for a real-time application.
 
 \section{Outlook}
+The DAEbot software structure is currently functioning with a fixed number of tasks which is less than the total amount of sensors. This means that the DAEbot can't send every sensors' data at once. Even though this issue is being fixed and it appears the DAEbot will be able to send every sensors' data at once, as the present work is being done, this issue has not been fixed yet.
+
+On top of the software structure, DA\_AMiRo has three STM boards which allows more computational power compared to the one STM board destined to the DAEbot project. This advantage of the DA\_AMiRo's computational power makes it able to handle more parallel tasks than the DAEbot for starters.
+
+Now lets look at advantages of the DAEbot. The DA\_AmiRo's computational power is too big regarding the current application, this means that there is a lot of computational power that the project is not using. The DAEbot was build for this specific application which means that the resources can be focused on it without being wasted. Even though this does not seem like a big deal, it is a huge advantage as all its resources are being used with a common goal and there is no computational power being used in other parts of the project that does not contribute to the main objective.
+
+A good option for improving the DAEbot's functionality would be to replace the current system of the fixed number of tasks being handled by an array of tasks, with an approach like the one of the DA\_AMiRo, where every sensor has its own task which can be handled completely by the sensor data handler.
 
 %bibliography
 \printbibliography
