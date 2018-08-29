@@ -117,12 +117,32 @@ These characteristics make AMiRo a very compact and portable robot. Every board 
 The AMiRo project was started in 2015 and ever since, the repository supporting the AMiRo project has had several updates \cite{AMiRo_Wiki}. It is worth mentioning that the version used as the basis for the present work was the version 1.0 stable. The AMiRo's repository consists of three basic folders: AMiRo bootloader, AMiRo Operating System, and ChibiOS.
 
 Although this software architecture will be explained with more detail in section \ref{sec:soft}, it is worth mentioning that AMiRo's bootloader was used as it is in version 1.0 from the original repository in order to configure the computer for programming the AMiRo. The ChibiOS was also used as it is in version 1.0 from the repository \cite{AMiRo_Wiki}. The AMiRo Operating System was hugely modified to meet the requirements of the present work, which can be found under the current project's repository \textit{DA\_AMiRo} \cite{AMiRo_Git}.
+
+In figure \ref{fig:real_1} the AMiRo robot with its three basic boards is presented with and without chassis. In the picture with chassis, a hand is presented to help visualize the actual size of the AMiRo, and in the photograph without chassis some of the components of the AMiRo can be seen. In order from bottom to top, the three basic boards are: \textit{DiWheelDrive}, \textit{PowerManagement}, and \textit{LightRing}. It is also possible to see the wheels, the motors, and the batteries attached to their corresponding boards. These structure will be explained in the next section.
 %\footnote{AMiRo's original repository: https://openresearch.cit-ec.de/projects/amiro-os/wiki \cite{AMiRo_Wiki}}.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{real_amiro_1}
+    \caption{AMiRo with and without chassis \cite{AMiRo_paper_modular}.}
+    \label{fig:real_1}
+\end{figure}
+\clearpage
 
 \section{Hardware Architecture of AMiRo}
 As mentioned in the previous chapter, the AMiRo is equipped with three basic board modules and two extension boards. In this section each board will be briefly discussed with a special emphasis in the functionalities that are of interest for this work. For a more complete discussion about the boards or the AMiRo in general, the reader is invited to read the documentation referenced in this work, specially \cite{AMiRo_paper_verstaile, AMiRo_paper_modular, AMiRo_paper_applications, AMiRo_ppt_v1, AMiRo_ppt_v2} which can be found on the CITEC website or on the repository of this work on gitlab \cite{AMiRo_Git}.
 
 The functionality of the sensors used in the project will be briefly explained in this chapter. For the explanation on how to read the output of the sensors that are sent via the Controller Area Network protocol, the reader is invited to jump directly into section \ref{sec:canconv} for reviewing the CAN convention used in the entire project and section \ref{sec:sensorout} for understanding each sensor's output.
+
+In figure \ref{fig:schemat} a schematic of the AMiRo can be seen, with the three basic boards \textit{DiWheelDrive}, \textit{PowerManagement}, and \textit{LightRing} but also the extension boards \textit{ImageSensor}, \textit{Cognition}, and \textit{Image Processing}. The electrical interfaces are also displayed. For the current work, the most important thing to note in this image is that every board is able to talk to the CAN bus.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth]{amiro_schematic}
+    \caption{Inner parts of AMiRo with all extension boards, and overview of the electrical interfaces \cite{AMiRo_paper_modular}.}
+    \label{fig:schemat}
+\end{figure}
+\clearpage
 
 \subsection{DiWheelDrive}
 \label{sub:DWD}
@@ -131,6 +151,16 @@ The DiWheelDrive is the bottom board of the AMiRo. It is equipped with an ARM Co
 This board has two motors of 1W DC. The purpose of having two motors was to be able to have a differential kinematic to allow flexible movements \cite{AMiRo_paper_modular}. Among other sensors and actuators, the ones that are in this board and are being used in this work are: three axis gyroscope, accelerometer, and magnetometer, floor proximity sensors, the two motors, and optical motor encoders. The functionality and some specifications of the above mentioned sensors and actuators will be discussed in the next subsections.
 
 As mentioned before, the DiWheelDrive board has a Cortex-M3 MCU for calculating such things as motion control, odometry, and dead reckoning algorithms at high sampling rates \cite{AMiRo_paper_modular}. This board can be accessed by the other boards via the Controller Area Network protocol or via USB UART interface directly with the user. It is important to mention that every board has also a USB UART interface to communicate directly with the user but they are covered by the chassis except for the DiWheelDrive board \cite{AMiRo_paper_modular}.
+
+The \textit{DiWheelDrive} board ready to be mounted into the robot can be seen in figure \ref{fig:diwheel}. In this figure the board can be seen from both, the top and the bottom perspective.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{DiWheel_real}
+    \caption{Top and bottom view of the DiWheelDrive board \cite{AMiRo_ppt_v1}.}
+    \label{fig:diwheel}
+\end{figure}
+\clearpage
 
 \subsubsection{Gyroscope}
 The gyroscope is a sensor that measures rotational motion. The units of the resulting measurement are revolutions per second or degrees per second. As a quick example, in a balancing robot a gyroscope can be used to measure how much the robot has rotated from the desired position and this information can be sent to an actuator to make corrections in order to reach the desired angle \cite{gyrostheory}. A gyroscope normally consists of a mass that moves with constant angular momentum, so when the gyroscope is tilted the axis of rotation of said mass reacts to the applied rotational movements making the axis of rotation tilt. This tilting leads to a displacement of the capacitance fingers inside the sensor which changes the capacitance. Finally when compared to a reference capacitance level, the angular velocity can be determined \cite{AMiRo_ppt_v1}.
@@ -173,14 +203,44 @@ The Power Management board is the central basic module of AMiRo. This board is r
 
 There are two lithium-ion batteries connected to the Power Management board that power the whole system, and there are also some sensors on this board. Among the sensors that this board has, the ones that are being used by this project are: eight proximity sensors that act as proximity sensors and also as ambient light sensors, sensors for knowing if the charging cable is connected, the remaining battery charge or the time for a complete battery charge, the time for this both events to be completed, and the actual current consumption  \cite{AMiRo_paper_modular}.
 
+The \textit{PowerManagement} board ready to be mounted into the robot can be seen in figure \ref{fig:powerm}. In this figure the board can be seen from both, the top and the bottom perspective.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{power_real}
+    \caption{Top and bottom view of the Power Management board \cite{AMiRo_ppt_v1}.}
+    \label{fig:powerm}
+\end{figure}
+\clearpage
+
 \subsubsection{Power Status}
 For the tracking of the power status, AMiRo is equipped with a bq27500 Impedance Track from Texas Instruments that allows the robot to obtain information such as remaining battery capacity, state-of-charge, run-time to empty, battery voltage, and temperature \cite{impedancepart}.
 
 \subsubsection{Proximity Ring}
 As seen in section \ref{sec:AMS}, the eight vcnl4020 sensors in connected to the Power Management board are functioning as ambient light sensors and also as proximity sensors. For this last functionality, the sensor has a built-in infrared emitter and photo-pin-diode, having a maximum relying measurement of 200mm \cite{proxsensor}. These sensors are connected in a ring-fashion way so that the AMiRo has eight sensors throughout its entire circumference, making it able to detect obstacles in all horizontal directions. The units of the output are also in mm.
 
+The \textit{Proximity Ring} ready to be mounted into the robot can be seen in figure \ref{fig:proxring}. The proximity ring attaches to the \textit{Power Management} board as mentioned before.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[]{prox_ring_real}
+    \caption{Proximity Ring view \cite{AMiRo_ppt_v1}.}
+    \label{fig:proxring}
+\end{figure}
+\clearpage
+
 \subsection{Light Ring}
 The Light Ring board is the top-most board in the AMiRo. This board has a STMicroelectronics ARM Cortex-M3 based STM32F103 MCU. It contains eight RGB LEDs arranged in a circular way corresponding to the Proximity Ring discussed in last section. These LEDs can be set from the Cognition board, setting each color of the RGB channels \cite{AMiRo_paper_modular}.
+
+The \textit{LightRing} board ready to be mounted into the robot can be seen in figure \ref{fig:lightr}. In this figure the board can be seen from both, the top and the bottom perspective. As it can be seen in the image, the LEDs are positioned equidistant in a circular fashion. This board is the upmost board which is covered by a translucent material, allowing the user to see the colors of the LEDs.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{light_real}
+    \caption{Top and bottom view of the Light Ring board \cite{AMiRo_ppt_v1}.}
+    \label{fig:lightr}
+\end{figure}
+\clearpage
 
 \subsection{Cognition Board}
 \label{sub:cogn}
@@ -189,6 +249,16 @@ This board was thought as an extension board which is no longer from the basic s
 The most important feature of this board is the attached Gumstix Overo Computer-on-Module. In the current setup, the Overo TidalSTORM COM is being used, which combines an ARM Cortex-A8 based DaVinci DM3730 SoC from Texas Instruments \cite{AMiRo_paper_modular}. This board has the same serial programming port as on the three basic boards. It also has a Type A, a micro-AB, and an internal pin header USB interfaces \cite{AMiRo_paper_modular}.
 
 The operating system running on the Overo COM is based on the Linux Yocto reference distribution Poky \cite{poky}, and the way it communicates with the three basic boards is through CAN, using a simple SocketCAN software-wrapper that is offered by this distribution \cite{AMiRo_paper_modular}.
+
+The \textit{Cognition} board ready to be mounted into the robot can be seen in figure \ref{fig:cogb}. In this figure the board can be seen from both, the top and the bottom perspective.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{cognition_real}
+    \caption{Top and bottom view of the Cognition board \cite{AMiRo_ppt_v2}.}
+    \label{fig:cogb}
+\end{figure}
+\clearpage
 
 \section{Software Architecture of AMiRo}
 \label{sec:soft}
@@ -642,10 +712,9 @@ In this chapter the structure and functionality of both projects DA\_AMiRo and D
 
 
 
-In a quick glance at the results, the DA\_AMiRo seems to be slightly better in functionality. The results in DAEbot have a 100ns - 1ms timeouts inaccuracy which compared to the approximate 545\mu s timeouts for the DA\_AMiRo are for starters a big disadvantage for a real-time application.
+In a quick glance at the results, the DA\_AMiRo seems to be slightly better in functionality. The results in DAEbot have a 100ns - 1ms timeouts inaccuracy which compared to the approximate $545\mu s$ timeouts for the DA\_AMiRo are for starters a big disadvantage for a real-time application.
 
-In both systems, the multi threading gets compromised and looses some of its reliability because the CAN module is just one and it needs approximately 545\mu s to send one frame. This was obtained with the following equation: $$1 us   (  1 + 11 +   1 +   1 +   1 +   4 +   64 +  15 +     1 +   1 +     1 +   7) * 5        = 545 us
-   1/ (1 MHz) * (SOF + ID + RTR + IDE + RES + DLC + DATA + CRC + DELIM + ACK + DELIM + EOF) * #RETRIES$$
+In both systems, the multi threading gets compromised and looses some of its reliability because the CAN module is just one and it needs approximately $545\mu s$ to send one frame. This was obtained with the following equation: $$1 us   (1+11+1+1+1+4+64+15+1+1+1+7)*5= 545 us$$ $$1/(1MHz)*(SOF+ID+RTR+IDE+RES+DLC+DATA+CRC+$$ $$DELIM+ACK+DELIM+EOF)*No. RETRIES$$
 taken from the original code of the repository \cite{AMiRo_Wiki}.
 \section{Outlook}
 The DAEbot software structure is currently functioning with a fixed number of tasks which is less than the total amount of sensors. This means that the DAEbot can't send every sensors' data at once. Even though this issue is being fixed and it appears the DAEbot will be able to send every sensors' data at once, as the present work is being done, this issue has not been fixed yet.
@@ -655,6 +724,9 @@ On top of the software structure, DA\_AMiRo has three STM boards which allows mo
 Now lets look at advantages of the DAEbot. The DA\_AmiRo's computational power is too big regarding the current application, this means that there is a lot of computational power that the project is not using. The DAEbot was build for this specific application which means that the resources can be focused on it without being wasted. Even though this does not seem like a big deal, it is a huge advantage as all its resources are being used with a common goal and there is no computational power being used in other parts of the project that does not contribute to the main objective.
 
 A good option for improving the DAEbot's functionality would be to replace the current system of the fixed number of tasks being handled by an array of tasks, with an approach like the one of the DA\_AMiRo, where every sensor has its own task which can be handled completely by the sensor data handler.
+
+
+%sequence diagram (varios)
 
 %bibliography
 \printbibliography
