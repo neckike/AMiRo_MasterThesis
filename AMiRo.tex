@@ -635,7 +635,7 @@ In figure \ref{fig:sensorclass} the structure of the sensor data handler can be 
 \section{Overall functionality}
 The sensor handler is a class which has only once instance and its started in the main class, along with the tasks for all the sensors inside each board. When the task for the sensor handler is started, it polls the CAN reception for a CAN frame that has the C\_S bit set to a '0' which corresponds to a \textit{Command data}, according to fig \ref{fig:can} of section \ref{sec:canconv}.
 
-Whenever the sensor handler detects a CAN frame corresponding to a \textit{Command data}, the CAN frame has to be further analyzed to know if it is trying to communicate with a \textit{sensor} or with an \textit{actuator}.
+Whenever the sensor handler detects a CAN frame corresponding to a \textit{Command data}, the CAN frame has to be further analyzed to know if it is trying to communicate with a \textit{sensor} or with an \textit{actuator}. An example of this functionality can be seen in figure \ref{fig:seqoverall} which will be explained in section \ref{sub:rtimp}.
 
 \subsection{Sensor data handling}
 Whenever the command corresponds to a sensor, the next step is to read the DLC 0 to know if it is a command for stopping a sensor data, if it is a command for starting a publishing sensor data, or if it is a request for a one time transmission, see figure \ref{fig:sensormodes} from section \ref{sub:sensors}.
@@ -657,9 +657,25 @@ Finally, when the DLC 0 has a '2' which means that the user wants a \textit{One 
 In the other case, when the command is trying to communicate with an actuator, it goes into a sorter that separates the motor's command from the LEDs' command. If it is a command for the motors, then the motors get set with the velocity requested in the CAN frame. When its a LEDs command, the selected LED gets turn on or changes its color with the \textit{RGB} code reviewed in section \ref{sub:CANleds}.
 
 \subsection{Real-time implementation}
+\label{sub:rtimp}
 The tasks corresponding to the sensors can all be operating at once. The priority of the tasks is being handled as preemptive tasks. This means that if two tasks are racing for the processing time, the one with higher priority will be preempted. Also, if one task is asked to output its value at the same frequency as a task that is already outputting its value, the one with higher priority will be on schedule and the one with less priority can be delayed some $\mu s$.
 
 Everything up to this point works as an independent sensor data handler. This means that the internal controller is encapsulated and complete. The only thing that can interact with the functioning system are commands in the CAN bus. For this purpose the MuRox board has to be set and running the Linux based Operating System. See next chapter for more information about how to debug and the functionality of the MuRoX board in general.
+
+An example of how the controller and the MuRoX board are communicating can be seen in figure \ref{fig:seqoverall}. The three boards are constantly checking the CAN bus for a CAN id corresponding to a \textit{command}. Whenever the MuRoX board sends a command asking for the gyroscope value with a specific frequency, this CAN frame gets fetched by the \textit{DiWheelDrive} board and starts the thread of the gyroscope with the requested frequency and priority.
+
+In the image the MuRoX board asks then for a proximity ring value. This sensor is located on the \textit{Power Management} board so this thread gets started by this board. Afterwards, the MuRoX board asks to set the motor with a specific speed. The \textit{DiWheelDrive} board where the motors are connected, fetches this information and sets the motors accordingly.
+
+The same process gets carried out for the odometry value request, which is managed also by the \textit{DiWheelDrive} board. The MuRoX board asks to stop the gyroscope sensor from sending its value. This command also gets fetched by the same board and puts the corresponding thread to sleep.
+
+Finally the MuRoX board asks for the LED number 3 to turn on with a specific RGB value. This information is fetched by the \textit{Light Ring} board and turns on the LED with the requested information.
+
+\begin{figure}[ht]
+ \centering
+ \includegraphics[width=\textwidth, height=20cm]{sequence_overall}
+		\caption{Functionality of an example application}
+		\label{fig:seqoverall}
+\end{figure}
 
 \chapter{MuRoX board}
 \label{chap:reflective}
@@ -684,18 +700,44 @@ It is intended for a Simulink model to be compiled and programmed into the MuRoX
 
 It is worth mentioning that the Simulink model is being done in cooperation but mostly by Uwe Jahn and it is still work in progress.
 
-\section{Example application}
+\section{Example applications}
 \label{sect:example}
-For testing purposes, three demo applications were created. These three applications are already inside the MuRoX board, but the user can modify the source code which is obtainable from the DA\_AMiRo git repository \cite{AMiRo_Git}. The modified versions of the source code can be compiled and uploaded to the MuRoX board using the method already described in section \ref{sec:poky}.
+For testing purposes, three demo applications were created. These three applications are already inside the MuRoX board, but the user can modify the source code which is obtainable from the DA\_AMiRo git repository \cite{AMiRo_Git}. The modified versions of the source code can be compiled and uploaded to the MuRoX board using the method already described in section \ref{sec:poky}. The three demos are:
+
+\begin{itemize}
+  \item \textit{Demo Sender Reflective Operator}
+  \item \textit{Demo Receiver Reflective Operator}
+	\item \textit{Demo Standalone Reflective Operator}
+\end{itemize}
 
 The first one is called \textit{Demo Sender Reflective Operator} and it is a simple application where the user can send commands to the internal controller with assistance of a set of menus. The application asks for the priority, the topic id, the mode to be set, and all the needed fields for each case. It also separates actuators from sensors. This application facilitates the sending of commands, because the user does not have to memorize the topic ids or the CAN frame conventions.
-%imagen de ejemplo
 
-The second application is called \textit{Demo Receiver Reflective Operator} and it is basically a thread that outputs the information that the CAN bus receives corresponding to the sensors. The information is translated in English so the user can read it easily without the necessity of the convention shown in figures \ref{fig:can} and \ref{fig:sensormodes}. The output shows the priority, a time stamp upon the reception of the CAN frame, the topic of the sensor's data, the value, and its units.
+In figures \ref{fig:sender1} and \ref{fig:sender2} a possible usage of the demo is shown. The menus can be seen, as the first one asks if the user wants to talk with an actuator or a sensor. If the answer is an actuator, like in figure \ref{fig:sender2} the second menu is to select which actuator to use and finally to set the according values to the desired actuator. If the user wants to talk with a sensor like in figure \ref{fig:sender1}, the menus ask for the mode: stop, publisher, and one time transmission. Then it proceeds to ask the frequency if it was publisher, the topic and the priority.
+
+\begin{figure}[ht]
+ \centering
+ \includegraphics[width=\textwidth, height=18cm]{sender_example}
+		\caption{Example of a \textit{Demo Sender Reflective Operator} usage}
+		\label{fig:sender1}
+\end{figure}
+
+\begin{figure}[h]
+ \centering
+ \includegraphics[width=\textwidth, height=8cm]{sender_example2}
+		\caption{Example of a \textit{Demo Sender Reflective Operator} usage, part 2}
+		\label{fig:sender2}
+\end{figure}
+
+The second application is called \textit{Demo Receiver Reflective Operator} and it is basically a thread that outputs the information that the CAN bus receives corresponding to the sensors. The information is translated in English so the user can read it easily without the necessity of the convention shown in figures \ref{fig:can} and \ref{fig:sensormodes}. The output shows the priority, a time stamp upon the reception of the CAN frame, the topic of the sensor's data, the value, and its units. This can be seen in figure \ref{fig:receiver1}, where an example of how the receiver displays the information of some of the sensors.
+
+\begin{figure}[ht]
+ \centering
+ \includegraphics[width=\textwidth, height=18cm]{receiver_example}
+		\caption{Example of a \textit{Demo Receiver Reflective Operator} usage}
+		\label{fig:receiver1}
+\end{figure}
 
 The idea behind these two applications \textit{Demo Sender Reflective Operator} and \textit{Demo Receiver Reflective Operator} is that the user runs both at the same time in two different terminal windows to send commands and to see how they are being answered in real time.
-
-%imagen de ejemplo
 
 The third application is called \textit{Demo Standalone Reflective Operator}. It has a determined functionality so the user needs only to run it in order to see its results with the help of the \textit{Demo Standalone Reflective Operator} or the \textit{candump} package. This Demo has a set of commands to be sent to the internal controller and shows the outputs of the sensors. The functionality will be
 
@@ -711,11 +753,11 @@ In this chapter the structure and functionality of both projects DA\_AMiRo and D
 %Aquí van los resultados, imágenes de resultados y explicación.
 
 
-
 In a quick glance at the results, the DA\_AMiRo seems to be slightly better in functionality. The results in DAEbot have a 100ns - 1ms timeouts inaccuracy which compared to the approximate $545\mu s$ timeouts for the DA\_AMiRo are for starters a big disadvantage for a real-time application.
 
 In both systems, the multi threading gets compromised and looses some of its reliability because the CAN module is just one and it needs approximately $545\mu s$ to send one frame. This was obtained with the following equation: $$1 us   (1+11+1+1+1+4+64+15+1+1+1+7)*5= 545 us$$ $$1/(1MHz)*(SOF+ID+RTR+IDE+RES+DLC+DATA+CRC+$$ $$DELIM+ACK+DELIM+EOF)*No. RETRIES$$
 taken from the original code of the repository \cite{AMiRo_Wiki}.
+
 \section{Outlook}
 The DAEbot software structure is currently functioning with a fixed number of tasks which is less than the total amount of sensors. This means that the DAEbot can't send every sensors' data at once. Even though this issue is being fixed and it appears the DAEbot will be able to send every sensors' data at once, as the present work is being done, this issue has not been fixed yet.
 

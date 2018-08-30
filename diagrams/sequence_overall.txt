@@ -1,0 +1,61 @@
+@startuml
+participant DiWheelDrive
+participant PowerManagement
+participant LightRing
+participant Cognition
+participant CAN
+
+loop until a command frame is spotted
+     DiWheelDrive -> CAN: command of one of my topics?
+     PowerManagement -> CAN: command of one of my topics?
+     LightRing -> CAN:command of one of my topics?
+end
+
+Cognition -> CAN : command for gyroscope
+activate CAN
+DiWheelDrive -> CAN: command of gyroscope detected
+destroy CAN
+
+group Gyroscope Thread
+     DiWheelDrive -> CAN: sending gyroscope value with requested frequency
+end
+
+Cognition -> CAN : command for proximity ring
+activate CAN
+PowerManagement -> CAN: command of proximity ring detected
+destroy CAN
+
+group Proximity Ring Thread
+     PowerManagement -> CAN: sending proximity ring value with requested frequency
+end
+
+Cognition -> CAN : command for motor
+activate CAN
+DiWheelDrive -> CAN: command of motor detected
+destroy CAN
+
+DiWheelDrive -> DiWheelDrive: motors set to requested speed
+
+Cognition -> CAN : command for odometry
+activate CAN
+DiWheelDrive -> CAN: command of odometry detected
+destroy CAN
+
+group Odometry Thread
+     DiWheelDrive -> CAN: sending odometry and actual velocity value with requested frequency
+end
+
+Cognition -> CAN : command for halt gyroscope
+activate CAN
+DiWheelDrive -> CAN: command for halt gyroscope detected
+destroy CAN
+
+DiWheelDrive -> CAN: gyroscope thread put to sleep
+
+Cognition -> CAN : command for turning LED 3 on
+activate CAN
+LightRing -> CAN: command for setting LED 3 detected
+destroy CAN
+
+LightRing -> LightRing: turning LED 3 on with requested color
+@enduml
