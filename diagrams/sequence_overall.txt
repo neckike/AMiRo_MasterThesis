@@ -3,59 +3,59 @@ participant DiWheelDrive
 participant PowerManagement
 participant LightRing
 participant Cognition
-participant CAN
+participant CANbus
 
 loop until a command frame is spotted
-     DiWheelDrive -> CAN: command of one of my topics?
-     PowerManagement -> CAN: command of one of my topics?
-     LightRing -> CAN:command of one of my topics?
+     DiWheelDrive -> CANbus: command of one of my topics?
+     PowerManagement -> CANbus: command of one of my topics?
+     LightRing -> CANbus:command of one of my topics?
 end
 
-Cognition -> CAN : command for gyroscope
-activate CAN
-DiWheelDrive -> CAN: command of gyroscope detected
-destroy CAN
+Cognition -> CANbus : command for gyroscope
+activate CANbus
+DiWheelDrive -> CANbus: command of gyroscope detected
+destroy CANbus
 
 group Gyroscope Thread
-     DiWheelDrive -> CAN: sending gyroscope value with requested frequency
+     DiWheelDrive -> CANbus: sending gyroscope value with requested frequency
 end
 
-Cognition -> CAN : command for proximity ring
-activate CAN
-PowerManagement -> CAN: command of proximity ring detected
-destroy CAN
+Cognition -> CANbus : command for proximity ring
+activate CANbus
+PowerManagement -> CANbus: command of proximity ring detected
+destroy CANbus
 
 group Proximity Ring Thread
-     PowerManagement -> CAN: sending proximity ring value with requested frequency
+     PowerManagement -> CANbus: sending proximity ring value with requested frequency
 end
 
-Cognition -> CAN : command for motor
-activate CAN
-DiWheelDrive -> CAN: command of motor detected
-destroy CAN
+Cognition -> CANbus : command for motor
+activate CANbus
+DiWheelDrive -> CANbus: command of motor detected
+destroy CANbus
 
 DiWheelDrive -> DiWheelDrive: motors set to requested speed
 
-Cognition -> CAN : command for odometry
-activate CAN
-DiWheelDrive -> CAN: command of odometry detected
-destroy CAN
+Cognition -> CANbus : command for odometry
+activate CANbus
+DiWheelDrive -> CANbus: command of odometry detected
+destroy CANbus
 
 group Odometry Thread
-     DiWheelDrive -> CAN: sending odometry and actual velocity value with requested frequency
+     DiWheelDrive -> CANbus: sending odometry and actual velocity value with requested frequency
 end
 
-Cognition -> CAN : command for halt gyroscope
-activate CAN
-DiWheelDrive -> CAN: command for halt gyroscope detected
-destroy CAN
+Cognition -> CANbus : command for halt gyroscope
+activate CANbus
+DiWheelDrive -> CANbus: command for halt gyroscope detected
+destroy CANbus
 
-DiWheelDrive -> CAN: gyroscope thread put to sleep
+DiWheelDrive -> CANbus: gyroscope thread put to sleep
 
-Cognition -> CAN : command for turning LED 3 on
-activate CAN
-LightRing -> CAN: command for setting LED 3 detected
-destroy CAN
+Cognition -> CANbus : command for turning LED 3 on
+activate CANbus
+LightRing -> CANbus: command for setting LED 3 detected
+destroy CANbus
 
 LightRing -> LightRing: turning LED 3 on with requested color
 @enduml

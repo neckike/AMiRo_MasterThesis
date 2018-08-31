@@ -363,6 +363,18 @@ The global class is the responsible for creating each object from each sensor an
 \label{chap:CAN}
 This chapter explains how to receive and transmit CAN frames in the AMiRo. The functionality of the CAN module had to be merged with the current ControllerAreaNetworkRx.cpp and ControllerAreaNetworkTx.cpp of the existing repository of AMiRo \cite{AMiRo_Wiki}. The ControllerAreaNetwork.h however, is the same that the DAEbot project is using. The reason behind sharing the ControllerAreaNetwork.h among projects is to be able to use a single Relfective Operator for both systems AMiRo and DAEbot so it is easier to compare functionalities.
 
+For starters, the baud rate requirement of the DAEbot project was set to 500kHz, this is why the same frequency was selected for the DA\_AMiRo. This frequency was achieved with the following equation, and can be changed from the CANRx and CANtx.cpp files that can be located with help of figure \ref{fig:OS}.
+
+\begin{equation} \label{eq:baudrate1}
+	500kHz= \frac{8MHz}{(B1+B2+SW)*prescaler}
+\end{equation}
+
+Where the 8MHz is the clock frequency of the STM32F3, the B1 and B2 are the time quanta bit segment one and two accordingly. Finally, the SW represents the maximum time quanta. These values were configured by the previous AMiRo project which also happened to configure the CAN frequency to 500kHz. The values and the names of the variables in the actual code are: $$B1 = CAN\_BTR\_TS1 = 13$$ $$B2 = CAN\_BTR\_TS2 = 2$$ and $$SW = CAN\_BTR\_SJW = 1$$ $$Prescaler = CAN\_BTR\_BRP = 1$$, which results in the following equation:
+
+\begin{equation} \label{eq:baudrate2}
+	\frac{8MHz}{(13+2+1)*1} = 500kHz
+\end{equation}
+
 \section{Convention used for sending and receiving frames}
 \label{sec:canconv}
 
@@ -672,8 +684,8 @@ Finally the MuRoX board asks for the LED number 3 to turn on with a specific RGB
 
 \begin{figure}[ht]
  \centering
- \includegraphics[width=\textwidth, height=20cm]{sequence_overall}
-		\caption{Functionality of an example application}
+ \caption{Functionality of an example application}
+ \includegraphics[width=\textwidth, height=18cm]{sequence_overall}
 		\label{fig:seqoverall}
 \end{figure}
 
