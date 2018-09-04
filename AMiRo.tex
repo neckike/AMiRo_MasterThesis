@@ -730,18 +730,18 @@ For testing purposes, three demo applications were created. These three applicat
 
 The first one is called \textit{Demo Sender Reflective Operator} and it is a simple application where the user can send commands to the internal controller with assistance of a set of menus. The application asks for the priority, the topic id, the mode to be set, and all the needed fields for each case. It also separates actuators from sensors. This application facilitates the sending of commands, because the user does not have to memorize the topic ids or the CAN frame conventions.
 
-In figures \ref{fig:sender1} and \ref{fig:sender2} a possible usage of the demo is shown. The menus can be seen, as the first one asks if the user wants to talk with an actuator or a sensor. If the answer is an actuator, like in figure \ref{fig:sender2} the second menu is to select which actuator to use and finally to set the according values to the desired actuator. If the user wants to talk with a sensor like in figure \ref{fig:sender1}, the menus ask for the mode: stop, publisher, and one time transmission. Then it proceeds to ask the frequency if it was publisher, the topic and the priority.
+In figures \ref{fig:sender1} and \ref{fig:sender2} a possible usage of the demo is shown. The menus can be seen, as the first one asks if the user wants to talk with an actuator or a sensor. If the answer is an actuator, like in figure \ref{fig:sender1} the second menu is to select which actuator to use and finally to set the according values to the desired actuator. If the user wants to talk with a sensor like in figure \ref{fig:sender2}, the menus ask for the mode: stop, publisher, and one time transmission. Then it proceeds to ask the frequency if it was publisher, the topic and the priority.
 
 \begin{figure}[ht]
  \centering
- \includegraphics[width=\textwidth, height=18cm]{sender_example}
-		\caption{Example of a \textit{Demo Sender Reflective Operator} usage}
+ \includegraphics[width=\textwidth, height=8cm]{sender_example2}
+		\caption{Example of a \textit{Demo Sender Reflective Operator} usage, part 1}
 		\label{fig:sender1}
 \end{figure}
 
 \begin{figure}[h]
  \centering
- \includegraphics[width=\textwidth, height=8cm]{sender_example2}
+ \includegraphics[width=\textwidth, height=18cm]{sender_example}
 		\caption{Example of a \textit{Demo Sender Reflective Operator} usage, part 2}
 		\label{fig:sender2}
 \end{figure}
@@ -757,23 +757,71 @@ The second application is called \textit{Demo Receiver Reflective Operator} and 
 
 The idea behind these two applications \textit{Demo Sender Reflective Operator} and \textit{Demo Receiver Reflective Operator} is that the user runs both at the same time in two different terminal windows to send commands and to see how they are being answered in real time.
 
-The third application is called \textit{Demo Standalone Reflective Operator}. It has a determined functionality so the user needs only to run it in order to see its results with the help of the \textit{Demo Standalone Reflective Operator} or the \textit{candump} package. This Demo has a set of commands to be sent to the internal controller and shows the outputs of the sensors. The functionality will be
+The third application is called \textit{Demo Standalone Reflective Operator}. It has a determined functionality so the user needs only to run it in order to see its results with the help of the \textit{Demo Receiver Reflective Operator} or the \textit{candump} package. This Demo has a set of commands to be sent to the internal controller and shows the outputs of the sensors. The demo has the following expected functionality which can be seen in figures \ref{fig:timing1} and \ref{fig:timing2}.
 
-%explicar el standalone
-%poner imágenes de cada applicación demo...
+\begin{enumerate}
+\item At 1s the CAN bus has a command frame asking for the accelerometer values every 500ms.
+\item At 5s the CAN bus has a command frame asking for the proximity ring values every second.
+\item At 10s the CAN bus has a command frame asking for the power status one time.
+\item At 15s the CAN bus has a command frame asking for the gyroscope values every 5s.
+\item At 16s the CAN bus has a command frame asking for the proximity ring values to stop being transmitted.
+\item At 17s the CAN bus has a command frame asking for the magnetometer values every 800ms.
+\item At 18s the CAN bus has a command frame asking for the accelerometer values to stop being transmitted.
+\item At 21s the CAN bus has a command frame asking for the odometry values every 900ms.
+\item At 23s the CAN bus has a command frame asking to set the motors speed at 50$\mu m/s$.
+\item At 25s the CAN bus has a command frame asking to turn LED 1 on.
+\item At 27s the CAN bus has a command frame asking to stop the motors.
+\item At 30s the CAN bus has a command frame asking for the odometry values to stop being transmitted.
+\item At 31s the CAN bus has a command frame asking for the power status one time.
+\item At 33s the CAN bus has a command frame asking for the proximity floor values every 2s.
+\item At 35s the CAN bus has a command frame asking for the magnetometer values to stop being transmitted.
+\item At 38s the CAN bus has a command frame asking for the proximity ring values to stop being transmitted.
+\item At 40s the CAN bus has a command frame asking to turn LEDs 2, 4, 6, and 8 on.
+\end{enumerate}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth, height=13cm]{timing_1}
+  	\caption{Demo Standalone sequence part 1}
+  	\label{fig:timing1}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\textwidth, height=13cm]{timing_2}
+  	\caption{Demo Standalone sequence part 2}
+  	\label{fig:timing2}
+\end{figure}
 
 Lastly, the user can also send independent CAN frames using the \textit{candump} package installed in the MuRoX board, as it was already discussed in chapter \ref{chap:reflective}. For this method, the user has to decode previously the topic id and the CAN data frames according to images \ref{fig:can} and \ref{fig:sensormodes}.
 
 \chapter{Results}
-In this chapter the structure and functionality of the AMiRo OS and the OCM approach for the DA\_AMiRo project are compared.
+\section{DA\_AMiRo performance}
+In this section the performance of the AMiRo will be revised based the results of some testing conducted to the AMiRo. From all the testing conducted, the AMiRo's response to the \textit{Demo Standalone Reflective Operator} will be the one discussed in this section, because its desired functionality was already explained in section \ref{sect:example}.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth, height=15cm]{standalone_first}
+  	\caption{Demo Standalone results part 1}
+  	\label{fig:res1}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth, height=18cm]{standalone_last}
+  	\caption{Demo Standalone results part 2}
+  	\label{fig:res2}
+\end{figure}
+
+In figures \ref{fig:res1} the values of the accelerometer are visualized and also the values from the proximity ring sensors. In figure \ref{fig:res2} values of power status, magnetometer, and proximity floor sensors can be seen.
+
+For starters, lets look into the DA\_AMiRo efficiency. From the programming of the three basic boards, a $545\mu s$ delay of timeouts in every transmission is expected. This number can be explained with the following equation: $$1 us   (1+11+1+1+1+4+64+15+1+1+1+7)*5= 545 us$$ $$1/(1MHz)*(SOF+ID+RTR+IDE+RES+DLC+DATA+CRC+$$ $$DELIM+ACK+DELIM+EOF)*No. RETRIES$$
+taken from the original code of the repository \cite{AMiRo_Wiki}.
 
 \section{DA\_AMiRo vs. AMiRo OS}
-%Aquí van los resultados, imágenes de resultados y explicación.
+In this section the structure and functionality of the AMiRo OS and the OCM approach for the DA\_AMiRo project are compared.
 
-For starters, lets look into the DA\_AMiRo efficiency. The overall results have $545\mu s$ timeouts.
 
-In this system, the multi threading gets compromised and looses some of its reliability because the CAN module is just one and it needs approximately $545\mu s$ to send one frame. This was obtained with the following equation: $$1 us   (1+11+1+1+1+4+64+15+1+1+1+7)*5= 545 us$$ $$1/(1MHz)*(SOF+ID+RTR+IDE+RES+DLC+DATA+CRC+$$ $$DELIM+ACK+DELIM+EOF)*No. RETRIES$$
-taken from the original code of the repository \cite{AMiRo_Wiki}.
 
 \section{Outlook}
 The DA\_AmiRo's computational power is too big regarding the current application, this means that there is a lot of computational power that the project is not using.

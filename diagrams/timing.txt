@@ -1,107 +1,120 @@
 @startuml
 robust "Gyroscope" as gyr
-robust "Accelerometer" as ac
+robust "Accelerometer" as ace
 robust "Magnetometer" as mag
 robust "Proximity Floor" as flo
 robust "Odometry" as odo
 robust "Proximity Ring" as rin
 robust "Power Status" as sta
-robust "Receiver" as R
+robust "CAN bus" as CAN
+robust "Actuator motors" as mot
+robust "Actuator LEDs" as led
 
-@R
+@CAN
 0 is Idle
+1 is Receiving
+CAN -> ace : accelerometer 500ms
+1.01 is Idle 
+5 is Receiving
+CAN -> rin : proximity ring 1s
+5.01 is Idle
+10 is Receiving
+CAN -> sta :  power status one time
+10.01 is Idle
+15 is Receiving
+CAN -> gyr :  gyroscope 5s
+15.01 is Idle
+16 is Receiving
+CAN -> rin :  stop proximity ring
+16.01 is Idle
+17 is Receiving
+CAN ->  mag : magnetometer 800ms
+17.01 is Idle
+18 is Receiving
+CAN ->  ace : stop accelerometer
+18.01 is Idle
+21 is Receiving
+CAN ->  odo : odometry 900ms
+21.01 is Idle
+23 is Receiving
+CAN ->  mot : set motors 50um/s
+23.01 is Idle
+25 is Receiving
+CAN-> led : set led 1 
+25.01 is Idle
+27 is Receiving
+CAN ->  mot : stop motors
+27.01 is Idle
+30 is Receiving
+CAN ->  odo : stop odometry
+30.01 is Idle
+31 is Receiving
+CAN ->  gyr : stop gyroscope
+31.01 is Idle
+32 is Receiving
+CAN -> sta : power statys one time 
+32.01 is Idle
+33 is Receiving
+CAN ->  flo : proximity floor 2s
+33.01 is Idle
+35 is Receiving
+CAN ->  mag : stop magnetometer
+35.01 is Idle
+38 is Receiving
+CAN ->  flo : stop proximity floor
+38.01 is Idle
+40 is Receiving
+CAN -> led : set led2,4,6,8
+40.01 is Idle
 
-10 is Polling
-20 is Idle
-30 is Processing
-R -> gyr : gyroscope 20ms
-40 is Idle
-50 is Processing
-R -> ac : accelerometer 10ms
-60 is Idle
-70 is Processing
-R -> odo : one time odometry
-80 is Idle
-90 is Processing
-R -> flo : proximity floor sensors 10ms
-100 is Idle
-110 is Processing
-R -> gyr : stop gyroscope
-120 is Idle
-130 is Polling
-140 is Idle
-150 is Processing
-R -> mag : magnetometer 30ms
-160 is Idle
-170 is Processing
-R -> sta : power status 10ms
-180 is Idle
-190 is Polling
-200 is Idle
-210 is Polling
-R -> flo : stop proximity floor sensor
-220 is Idle
+@ace
+0 is Sleep
+1 is Publisher
+18 is Sleep
 
-R@20 <-> @30 : {10ms}
-
-@gyr
-0 is Idle
-30 is Sending
-50 is Idle
-70 is Sending
-90 is Idle
-170 is Sending
-180 is Idle
-190 is Sending
-200 is Idle
-210 is Sending
-220 is Idle
-
-@ac
-0 is Idle
-50 is Sending 
-60 is Idle
-70 is Sending
-80 is Idle
-90 is Sending
-100 is Idle
-110 is Sending
-120 is Idle
-130 is Sending
-140 is Idle
-150 is Sending
-160 is Idle
-170 is Sending
-180 is Idle
-190 is Sending
-200 is Idle
-210 is Sending
-220 is Idle
-
-@flo
-0 is Idle
-90 is Sending
-100 is Idle
-110 is Sending
-120 is Idle
-130 is Sending
-140 is Idle
-150 is Sending
-160 is Idle
-170 is Sending
-180 is Idle
-190 is Sending
-200 is Idle
-
-
-@mag
-0 is Idle
-150 is Sending
-180 is Idle
-210 is Sending
+@rin
+0 is Sleep
+5 is Publisher
+16 is Sleep
 
 @sta
-0 is Idle
-70 is Sending
-80 is Idle
+0 is Sleep
+10 is OneTimeTransmission
+10.01 is Sleep
+32 is OneTimeTransmission
+32.01 is Sleep
+
+@gyr
+0 is Sleep
+15 is Publisher
+31 is Sleep
+
+@mag
+0 is Sleep
+17 is Publisher
+35 is Sleep
+
+@odo
+0 is Sleep
+21 is Publisher
+30 is Sleep
+
+@mot
+0 is Sleep
+23 is SettingMotors
+23.01 is Sleep
+27 is SettingMotors
+27.01 is Sleep
+
+@flo
+0 is Sleep
+33 is Publisher
+38 is Sleep
+
+@led
+0 is Sleep
+25 is SetingLED
+25.01 is Sleep
+40 is SettingLED
+40.04 is Sleep
 @enduml
