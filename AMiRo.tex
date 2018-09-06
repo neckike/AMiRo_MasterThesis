@@ -302,6 +302,7 @@ A project containing ChibiOS consists on the Operating System source files, few 
 \label{AMiRo_OS}
 AMiRo's Operating System or board specific abstraction layer from the original repository \cite{AMiRo_Wiki} includes two basic applications, the first one is a rudimentary command shell and the second one a hardware test. The first one is already integrated in ChibiOS and it is extended by module specific commands \cite{AMiRo_paper_modular}.
 
+\subsubsection{AMiRo OS structure}
 The structure of the AMiRo Operating System, including the files that are being used with the current project can be visualized in figure \ref{fig:OS}. The entire project is written in C++ language, with some inclusions of C code. In this figure, it can be seen that inside \textit{AMiRo\_OS} there is the \textit{components} folder which contains the shared codes that the three boards are using. The other part of the structure worth mentioning now is the \textit{devices} folder in which the three boards have their own set of files, always maintaining the same structure among them.
 
 \begin{figure}[ht]
@@ -313,10 +314,30 @@ The structure of the AMiRo Operating System, including the files that are being 
 
 As mentioned before, the AMiRo OS has a command shell application which has a set of pre-stablished commands corresponding to commands that can set the lights of the AMiRo on, the motors, calibrate sensors, set a desired velocity or a distance for AMiRo to travel, get some sensor values, among other things.
 
-Every board has a user thread that is doing a specific application in each one.
+Lets look at \textit{main.cpp} from \textit{DiWheelDrive} board. The shell which was already mentioned is being managed by this board. Every sensor that will be used is waken up and the communications protocols for each one is started. It is also in this code where all the threads are being started. The threads are:
+
+\begin{itemize}
+  \item Power status
+  \item Magnetometer
+	\item Gyroscope
+	\item Accelerometer
+	\item Motor control
+	\item Odometry
+	\item User thread
+\end{itemize}
+
+Each one of these threads is also a class which objects are created in the \textit{global.h} so that the encapsulated values of each object can be accessed from the outside. In global.h all the sensors corresponding to the \textit{DiWheelDrive} are initialized and configured for its use. As an example, the registers for using the magnetometer or \textit{hmc5883l} are configured to set the number of samples averaged, select the data output rate bits, set the measurement configuration bits, set the gain configuration bits, among other things. For more precise information about the registers and how to configure the sensors, please refer to the sensor's data sheet, in this case \cite{magnetometerpart}.
+
+Global is also a class and an instance is created in \textit{main.cpp} called \textit{robot}, meaning that from \textit{main.cpp} the user can access the elements of \textit{robot} among which are the objects of the sensors listed above. For example, in order to access the magnetometer, the user has to use something like this: \textit{robot.hmc5883l...}
+
+
+The Power status in this board only makes a self test and initiates a power monitor. The magnetometer task has a function for updating the sensor data the
+
+% Explicar cada uno a grandes rasgos
 
 % Hablar mucho del AMIRO OS --...mucho
 
+\subsubsection{AMiRo OS functionality}
 
 %\clearpage
 \chapter{DA\_AMiRo software architecture}
@@ -504,7 +525,7 @@ The three axis of the accelerometer come together in one CAN frame with a DLC of
 \end{table}
 
 \subsubsection{Magnetometer}
-In the case of the Magnetometer, every axis has an independent id, this is because the size of the data is 32bits in little-endian format. Every value comes in two's complement and the units are $Gauss$, and the result is scaled by $+/-5Gauss$. See table \ref{tab:magnetometer}.
+In the case of the Magnetometer, every axis has an independent id, this is because the size of the data is 32bits in little-endian format. Every value comes in two's complement and the units are $\mu Gauss$, and the result is scaled by $+/-5Ga$. See table \ref{tab:magnetometer}.
 
 \begin{table}[h!]
 \centering
@@ -515,7 +536,7 @@ In the case of the Magnetometer, every axis has an independent id, this is becau
 	'x' axis			&	DLC[3] DLC[2] DLC[1] DLC[0]	\\	\hline
 	'y'	axis			&	DLC[3] DLC[2] DLC[1] DLC[0]	\\	\hline
 	'z'	axis			&	DLC[3] DLC[2] DLC[1] DLC[0]	\\	\hline
-	units					&	Gauss												\\	\hline
+	units					&	$\mu Gauss$									\\	\hline
 	note					& value in two's complement 	\\	\hline
 \end{tabular}
 \caption{\label{tab:magnetometer} CAN frame format from the output of the magnetometer}
@@ -540,7 +561,7 @@ The four proximity sensors on the bottom of the AMiRo are together in one CAN fr
 \end{table}
 
 \subsubsection{Encoder}
-This sensor returns both the actual velocity and the odometry of the AMiRo. The first value will be the actual velocity followed by the odometry. For the odometry, the 'x' coordinate in $\mu m$ with a size of 32bits, the 'y' coordinate in $\mu m$ with a size of 32bits, and the orientation of the wheels in $\mu rad$ with a size of 16bits. All of these values are together in one CAN frame. See table \ref{tab:encoder}.
+This sensor returns both the actual velocity and the odometry of the AMiRo. The first value will be the actual velocity followed by the odometry. For the odometry, the 'x' coordinate in $\mu m$ with a size of 32bits, the 'y' coordinate in $\mu m$ with a size of 32bits with a format of little-endian, and the orientation of the wheels in $\mu rad$ with a size of 16bits. All of these values are together in one CAN frame. See table \ref{tab:encoder}.
 
 \begin{table}[h!]
 \centering
@@ -548,16 +569,16 @@ This sensor returns both the actual velocity and the odometry of the AMiRo. The 
 	\hline
 	DLC										&	8																\\	\hline
 	size of data					&	32 bits, 32 bits, and 16 bits		\\	\hline
-	'x' coordinate				&	DLC[0] DLC[1] DLC[2] 						\\	\hline
-	'y'	coordinate				&	DLC[3] DLC[4] DLC[5] 						\\	\hline
-	orientation of wheels	&	DLC[6] DLC[7] 									\\	\hline
+	'x' coordinate				&	DLC[2] DLC[1] DLC[0] 						\\	\hline
+	'y'	coordinate				&	DLC[5] DLC[4] DLC[3] 						\\	\hline
+	orientation of wheels	&	DLC[7] DLC[6] 									\\	\hline
 	units									&	$\mu m$, $\mu m$, and $\mu rad$	\\	\hline
 \end{tabular}
 \caption{\label{tab:encoder} CAN frame format from the encoder}
 \end{table}
 
 \subsubsection{Actual velocity}
-The actual velocity will be composed of the 'x' velocity in $\mu m/s$ with a size of 32bits and the 'z' angular velocity in $\mu rad/s$ also in 32bits. These two values are together in one CAN frame. See table \ref{tab:velocity}.
+The actual velocity will be composed of the 'x' velocity in $\mu m/s$ with a size of 32bits and the 'z' angular velocity in $\mu rad/s$ also in 32bits with a format of little-endian. These two values are together in one CAN frame. See table \ref{tab:velocity}.
 
 \begin{table}[h!]
 \centering
@@ -565,8 +586,8 @@ The actual velocity will be composed of the 'x' velocity in $\mu m/s$ with a siz
 	\hline
 	DLC										&	8														\\	\hline
 	size of data					&	32bits											\\	\hline
-	'x' velocity					&	DLC[0] DLC[1] DLC[2] DLC[3]	\\	\hline
-	'z'	angular velocity	&	DLC[4] DLC[5] DLC[6] DLC[7]	\\	\hline
+	'x' velocity					&	DLC[3] DLC[2] DLC[1] DLC[0]	\\	\hline
+	'z'	angular velocity	&	DLC[7] DLC[6] DLC[5] DLC[4]	\\	\hline
 	units									&	$\mu m/s$ and $\mu rad/s$		\\	\hline
 \end{tabular}
 \caption{\label{tab:velocity} CAN frame format from the output of the actual velocity}
@@ -750,12 +771,12 @@ In figures \ref{fig:sender1} and \ref{fig:sender2} a possible usage of the demo 
 		\label{fig:sender2}
 \end{figure}
 
-The second application is called \textit{Demo Receiver Reflective Operator} and it is basically a thread that outputs the information that the CAN bus receives corresponding to the sensors. The information is translated in English so the user can read it easily without the necessity of the convention shown in figures \ref{fig:can} and \ref{fig:sensormodes}. The output shows the priority, a time stamp upon the reception of the CAN frame, the topic of the sensor's data, the value, and its units. This can be seen in figure \ref{fig:receiver1}, where an example of how the receiver displays the information of some of the sensors.
+The second application is called \textit{Demo Receiver Reflective Operator} and it is basically a thread that outputs the information that the CAN bus receives corresponding to the sensors. The information is translated in English so the user can read it easily without the necessity of the convention shown in figures \ref{fig:can} and \ref{fig:sensormodes}. The output shows the priority, a time stamp upon the reception of the CAN frame, the topic of the sensor's data, the value, and its units. This can be seen in figure \ref{fig:receiver1}, where an example of how the receiver displays the information of the gyroscope can be seen.
 
 \begin{figure}[ht]
  \centering
- \includegraphics[width=\textwidth, height=18cm]{receiver_example}
-		\caption{Example of a \textit{Demo Receiver Reflective Operator} usage}
+ \includegraphics[]{receiver_example}
+		\caption{Example of a \textit{Demo Receiver Reflective Operator} for the gyroscope}
 		\label{fig:receiver1}
 \end{figure}
 
@@ -805,19 +826,38 @@ In this section the performance of the AMiRo will be revised based the results o
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth, height=15cm]{standalone_first}
+	\includegraphics[width=\textwidth, height=15cm]{standalone_sender}
+  	\caption{Demo Standalone results sender part}
+  	\label{fig:ressend}
+\end{figure}
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth, height=19cm]{standalone_1}
   	\caption{Demo Standalone results part 1}
   	\label{fig:res1}
 \end{figure}
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth, height=18cm]{standalone_last}
+	\includegraphics[width=\textwidth, height=16cm]{standalone_2}
   	\caption{Demo Standalone results part 2}
   	\label{fig:res2}
 \end{figure}
 
-In figures \ref{fig:res1} the values of the accelerometer are visualized and also the values from the proximity ring sensors. In figure \ref{fig:res2} values of power status, magnetometer, and proximity floor sensors can be seen.
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth, height=18cm]{standalone_3}
+  	\caption{Demo Standalone results part 3}
+  	\label{fig:res3}
+\end{figure}
+
+In figure \ref{fig:ressend} the process described in figures \ref{fig:timing1} and \ref{fig:timing2} can be seen as how the results were displayed. In figure \ref{fig:res1} the values of the accelerometer and the proximity ring sensors are displayed, as well as the power status. In figure \ref{fig:res2} values for the magnetometer, gyroscope, velocity, and encoders are displayed. And finally in figure \ref{fig:res3} the power status gets shown again and also the proximity floor sensors are displayed.
+
+As it can be seen, the delay between two proximity ring sensors, there is a delay
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%FALTAAAAAAAAAAAAAAAAAAAAAAAAA
 
 For starters, lets look into the DA\_AMiRo efficiency. From the programming of the three basic boards, a $545\mu s$ delay of timeouts in every transmission is expected. This number can be explained with the following equation: $$1 us   (1+11+1+1+1+4+64+15+1+1+1+7)*5= 545 us$$ $$1/(1MHz)*(SOF+ID+RTR+IDE+RES+DLC+DATA+CRC+$$ $$DELIM+ACK+DELIM+EOF)*No. RETRIES$$
 taken from the original code of the repository \cite{AMiRo_Wiki}.
