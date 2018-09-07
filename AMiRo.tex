@@ -298,11 +298,10 @@ Note: All the above mentioned characteristics can be found and further explained
 
 A project containing ChibiOS consists on the Operating System source files, few configuration files and a HAL file for the peripherals handling.
 
-\subsection{AMiRo Operating System}
+\subsection{AMiRo Operating System structure}
 \label{AMiRo_OS}
 AMiRo's Operating System or board specific abstraction layer from the original repository \cite{AMiRo_Wiki} includes two basic applications, the first one is a rudimentary command shell and the second one a hardware test. The first one is already integrated in ChibiOS and it is extended by module specific commands \cite{AMiRo_paper_modular}.
 
-\subsubsection{AMiRo OS structure}
 The structure of the AMiRo Operating System, including the files that are being used with the current project can be visualized in figure \ref{fig:OS}. The entire project is written in C++ language, with some inclusions of C code. In this figure, it can be seen that inside \textit{AMiRo\_OS} there is the \textit{components} folder which contains the shared codes that the three boards are using. The other part of the structure worth mentioning now is the \textit{devices} folder in which the three boards have their own set of files, always maintaining the same structure among them.
 
 \begin{figure}[ht]
@@ -312,8 +311,10 @@ The structure of the AMiRo Operating System, including the files that are being 
     \label{fig:OS}
 \end{figure}
 
+\subsection{AMiRo Operating System functionality}
 As mentioned before, the AMiRo OS has a command shell application which has a set of pre-stablished commands corresponding to commands that can set the lights of the AMiRo on, the motors, calibrate sensors, set a desired velocity or a distance for AMiRo to travel, get some sensor values, among other things.
 
+\subsubsection{DiWheelDrive project}
 Lets look at \textit{main.cpp} from \textit{DiWheelDrive} board. The shell which was already mentioned is being managed by this board. Every sensor that will be used is waken up and the communications protocols for each one is started. It is also in this code where all the threads are being started. The threads are:
 
 \begin{itemize}
@@ -321,23 +322,59 @@ Lets look at \textit{main.cpp} from \textit{DiWheelDrive} board. The shell which
   \item Magnetometer
 	\item Gyroscope
 	\item Accelerometer
+	\item Proximity floor sensors
 	\item Motor control
 	\item Odometry
 	\item User thread
 \end{itemize}
 
-Each one of these threads is also a class which objects are created in the \textit{global.h} so that the encapsulated values of each object can be accessed from the outside. In global.h all the sensors corresponding to the \textit{DiWheelDrive} are initialized and configured for its use. As an example, the registers for using the magnetometer or \textit{hmc5883l} are configured to set the number of samples averaged, select the data output rate bits, set the measurement configuration bits, set the gain configuration bits, among other things. For more precise information about the registers and how to configure the sensors, please refer to the sensor's data sheet, in this case \cite{magnetometerpart}.
+Each one of these threads is also a class which objects are created in the \textit{global.hpp} so that the encapsulated values of each object can be accessed from the outside. In global.h all the sensors corresponding to the \textit{DiWheelDrive} are initialized and configured for its use. As an example, the registers for using the magnetometer or \textit{hmc5883l} are configured to set the number of samples averaged, select the data output rate bits, set the measurement configuration bits, set the gain configuration bits, among other things. For more precise information about the registers and how to configure the sensors, please refer to the sensor's data sheet, in this case \cite{magnetometerpart}.
 
-Global is also a class and an instance is created in \textit{main.cpp} called \textit{robot}, meaning that from \textit{main.cpp} the user can access the elements of \textit{robot} among which are the objects of the sensors listed above. For example, in order to access the magnetometer, the user has to use something like this: \textit{robot.hmc5883l...}
+Global is also a class and an instance of it is created in \textit{main.cpp} which is called \textit{robot}, meaning that from \textit{main.cpp} the user can access the elements of \textit{robot} among which are the instances of the sensors listed above. For example, in order to access the magnetometer, the user has to use something like this: \textit{robot.hmc5883l...}.
+
+Regarding the threads listed above, the Power status in this board only makes a self test and initiates a power monitor. The magnetometer, gyroscope, accelerometer, power status, odometry, and the proximity floor classes, have functions for updating their sensor's data, and functions for getting the actual sensor's value in a raw format and also with a specific unit. For the available units for every sensor, see section \ref{sub:sensors}.
+
+The threads of the magnetometer, gyroscope, accelerometer, power status, odometry, and proximity floor sensors are constantly updating their values so that they are ready whenever they are required. As a side note, the magnetometer thread, the gyroscope thread, the accelerometer thread, and the proximity floor sensors thread are constantly broadcasting to the CAN bus at a given frequency which is set to $16Hz$.
+
+The motor control thread is constantly updating the increments of velocity, the speed, calculating velocities in desired units. In addition to this, the thread updates past velocities for the derivative part of a PID controller tje user has access to, and writes the calculated duty cycle of the PWM driver.
+
+Lastly, the user thread of the \textit{DiWheelDrive} is a complete line following application that makes AMiRo able to follow a black line on the ground that is over a white surface.
+
+\subsubsection{Power Management project}
+The \textit{Power Management} project follows the same structure mentioned for the \textit{DiWheelDrive}, with a \textit{main.cpp} and its own \textit{global.hpp}. The instance of the global class is also called \textit{robot} and also can be accessed from the \textit{main.cpp}. The list of the threads of the \textit{Power Management} is as follows:
+
+\begin{itemize}
+  \item Power status
+	\item Proximity ring sensors
+	\item ADC
+	\item Touch sensors %mpr121 part of the ring sensors
+	\item User thread
+\end{itemize}
+
+The proximity ring and the touch sensor threads are constantly updating its sensors' values. The touch sensor \textit{mpr121} is part of the proximity ring sensors structure and these two sensors are also broadcasting its values through the CAN bus like the ones from \textit{DiWheelDrive}.
+
+The power status thread receives help of the ADC thread which constantly monitoring the charge of the batteries and converting the analog levels of charge to a digital number. The power status thread then it is frequently updating values such as the current battery levels, the time of charge remaining, whether or not AMiRo is plugged in, and the current consumption.
+
+The user thread of the \textit{Power Management} is an obstacle avoidance application for the AMiRo which also sends commands via CAN to the \textit{DiWheelDrive} in order to stop the AMiRo or stir it in order to stop it from crashing.
 
 
-The Power status in this board only makes a self test and initiates a power monitor. The magnetometer task has a function for updating the sensor data the
+\subsubsection{Light Ring project}
+Finally the \textit{Light Ring} project is the simplest of the three projects, it follows the same structure mentioned for the \textit{DiWheelDrive} and \textit{Power Management}, with a \textit{main.cpp} and its own \textit{global.hpp}. The instance of the global class is also called \textit{robot} and also can be accessed from the \textit{main.cpp}. The list of the threads of the \textit{Light Ring} is as follows:
 
-% Explicar cada uno a grandes rasgos
+\begin{itemize}
+	\item Lidar
+	\item LEDs
+	\item User thread
+\end{itemize}
 
-% Hablar mucho del AMIRO OS --...mucho
+The lidar thread is performing a configuration of the lidar and a quick check to see if it is communicating correctly with the system. Afterwards it is constantly updating its values.
 
-\subsubsection{AMiRo OS functionality}
+The LEDs thread is constantly refreshing the LEDS with the preset brightness values and the colors assigned to each of them.
+
+The user thread of the \textit{Light Ring} has no implemented application and remains open for the user to assign one.
+
+%QUIZAS PONER IMAGENES
+
 
 %\clearpage
 \chapter{DA\_AMiRo software architecture}
@@ -507,7 +544,7 @@ The three axis of the gyroscope come together in one CAN frame with a DLC of six
 \end{table}
 
 \subsubsection{Accelerometer}
-The three axis of the accelerometer come together in one CAN frame with a DLC of six as the gyroscope. Each value has a size of 16bits with a format of little-endian. Every value comes in two's complement and the units are $g$, and the result is scaled $+/-8g$. See table \ref{tab:accelerometer}.
+The three axis of the accelerometer come together in one CAN frame with a DLC of six as the gyroscope. Each value has a size of 16bits with a format of little-endian. Every value comes in two's complement and the units are $mili g$, and the result is scaled $+/-8g$. See table \ref{tab:accelerometer}.
 
 \begin{table}[h!]
 \centering
@@ -518,7 +555,7 @@ The three axis of the accelerometer come together in one CAN frame with a DLC of
 	'x' axis			&	DLC[1] DLC[0]							\\	\hline
 	'y'	axis			&	DLC[3] DLC[2]							\\	\hline
 	'z'	axis			&	DLC[5] DLC[4]							\\	\hline
-	units					&	g													\\	\hline
+	units					&	$mili g$									\\	\hline
 	note					& value in two's complement \\	\hline
 \end{tabular}
 \caption{\label{tab:accelerometer} CAN frame format from the output of the accelerometer}
