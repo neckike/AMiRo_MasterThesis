@@ -1,0 +1,90 @@
+@startuml
+class DiWheelDrive
+class ControllerAreaNetworkRx
+class ControllerAreaNetworkTx
+class Accelerometer
+class Gyroscope
+class Magnetometer
+class ProximitySensors
+class Motor
+class Odometry
+
+ControllerAreaNetworkRx <|-- DiWheelDrive
+ControllerAreaNetworkTx <|-- DiWheelDrive
+Global *- "1" DiWheelDrive
+Global *-- "1" Accelerometer
+Global *-- "1" Gyroscope
+Global *-- "1" Magnetometer
+Global *---- "4" ProximitySensors
+Global *- "2" Motor
+Global *-- "1" Odometry
+
+class DiWheelDrive {
++extern Global global
+
+    +virtual msg_t updateSensorVal()
+    +virtual void periodicBroadcast()
+    #virtual msg_t receiveMessage()
+    #void  calibrateProximityFloorValues()
+}
+
+class ControllerAreaNetworkTx {
+#int boardId
+#chibios_rt::EvtListener eventTimerEvtListener
+#chibios_rt::EvtSource *eventTimerEvtSource
+-EvTimer evtimer
+-CANDriver *canDriver
+-CANConfig canConfig
+
++virtual msg_t updateSensorVal()
++void setLightBrightness(int brightness)
++void setLightColor(int index, Color color)
++void setTargetSpeed(types::kinematic &targetSpeed)
++void setTargetSpeed(int32_t leftURpm, int32_t rightURpm)
++void setOdometry(types::position robotPosition)
++void setTargetPosition(types::position &targetPosition, uint32_t targetTime)
++void setKinematicConstants(float Ed, float Eb)
++void txQueryShell(uint8_t toBoardId, char *textdata, uint16_t size)
++void txReplyShell(uint8_t toBoardId, char *textdata, uint16_t size)
++void broadcastShutdown()
+#virtual msg_t main()
+#void transmitMessage(CANTxFrame *frame)
+#virtual void periodicBroadcast() = 0
+#void encodeBoardId(CANTxFrame *frame, int board)
+#void encodeDeviceId(CANTxFrame *frame, int device)
+#void encodeIndexId(CANTxFrame *frame, int index)
+}
+
+class ControllerAreaNetworkRx {
++extern Global global
+#uint16_t proximityRingValue[8]
+#int actualSpeed[2]
+#uint16_t proximityFloorValue[4]
+#int32_t magnetometerValue[3]
+#int16_t gyroscopeValue[3]
+#int16_t accelerometerValue[3]
+
++uint8_t getRobotID()
++void calibrateProximityRingValues()
++void calibrateProximityFloorValues()
+#virtual msg_t main()
+#virtual msg_t receiveMessage(CANRxFrame *frame)
+#int decodeBoardId(CANRxFrame *frame)
+#int decodeDeviceId(CANRxFrame *frame)
+#int decodeIndexId(CANRxFrame *frame)
+-msg_t receiveSensorVal(CANRxFrame *frame)
+}
+
+class Global{
++Accelerometer accelerometer
++Gyroscope gyroscope
++Magnetometer magnetometer
++array<Motor, 2> motor
++Odometry odometry
++array<ProximitySensors, 4> proximitySensors
++MotorIncrements increments
++MotorControl motorcontrol
++Odometry odometry
++DiWheelDrive robot
+}
+@enduml

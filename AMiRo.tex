@@ -294,6 +294,7 @@ Some of the main characteristics from ChibiOS are:
 \item Events: Events, event flags, event sources.
 \item Dynamic services: Dynamic threading.
 \end{itemize}
+
 Note: All the above mentioned characteristics can be found and further explained in the ChibiOS homepage. \cite{chibioshp}
 
 A project containing ChibiOS consists on the Operating System source files, few configuration files and a HAL file for the peripherals handling.
@@ -313,6 +314,54 @@ The structure of the AMiRo Operating System, including the files that are being 
 
 \subsection{AMiRo Operating System functionality}
 As mentioned before, the AMiRo OS has a command shell application which has a set of pre-stablished commands corresponding to commands that can set the lights of the AMiRo on, the motors, calibrate sensors, set a desired velocity or a distance for AMiRo to travel, get some sensor values, among other things.
+
+There are two parent classes for all of the three basic boards: ControllerAreaNetworkTx.cpp and ControllerAreaNetworkRx.cpp. The ControllerAreaNetworkTx.cpp has the following functions:
+
+\begin{itemize}
+\item setLightBrightness(int brightness)
+\item setLightColor(int index, Color color)
+\item setOdometry(types::position robotPosition)
+\item setTargetSpeed(int32\_t leftURpm, int32\_t rightURpm)
+\item setTargetSpeed(kinematic \&targetSpeed)
+\item setTargetPosition(types::position \&targetPosition, uint32\_t targetTime)
+\item setKinematicConstants(float Ed, float Eb)
+\item broadcastShutdown()
+\item txQueryShell(uint8\_t toBoardId, char *textdata, uint16\_t size)
+\item txReplyShell(uint8\_t toBoardId, char *textdata, uint16\_t size)
+\item main(void)
+\item updateSensorVal()
+\item encodeBoardId(CANTxFrame *frame, int board)
+\item encodeDeviceId(CANTxFrame *frame, int device)
+\item encodeIndexId(CANTxFrame *frame, int index)
+\item transmitMessage(CANTxFrame *frame)
+\end{itemize}
+
+Among these functions, it can be seen that the ControllerAreaNetworkTx.cpp is the responsible for updating the sensor values and for broadcasting them. Another feature of this class is to manage the outgoing CAN frames, coding the device id, the board id and also the id of the index from the commands.
+
+The ControllerAreaNetworkRx.cpp is the responsible of managing the incoming CAN frames and the functions of this class are:
+
+\begin{itemize}
+\item getProximityRingValue(int index)
+\item getProximityFloorValue(int index)
+\item getActualSpeed(types::kinematic \&targetSpeed)
+\item getOdometry()
+\item getPowerStatus()
+\item getRobotID()
+\item getMagnetometerValue(int axis)
+\item getGyroscopeValue(int axis)
+\item calibrateProximityRingValues()
+\item calibrateProximityFloorValues()
+\item rxCmdShell(CANRxFrame *frame)
+\item main(void)
+\item decodeBoardId(CANRxFrame *frame)
+\item decodeDeviceId(CANRxFrame *frame)
+\item decodeIndexId(CANRxFrame *frame)
+\item receiveSensorVal(CANRxFrame *frame)
+\end{itemize}
+
+From the shown functions in ControllerAreaNetworkRx.cpp it is clear that this class receives the CAN frames, decodes the board, index, and device information. Once the purpose of the incoming CAN frame has been found out, the ControllerAreaNetworkRx.cpp proceeds to make use of the CAN frame according to its topic, if for example the CAN frame wanted to set the robot's position, the CANRx.cpp will set the values of robotPosition.x, robotPosition.y, and so on with the content of said frame. From the names of the functions, the reader can have a broad idea from what each of them does with the received CAN frame.
+
+Now that the functionality of the CANRx/Tx.cpp has been shown, each one of the three boards that inherit from them will be briefly discussed.
 
 \subsubsection{DiWheelDrive project}
 Lets look at \textit{main.cpp} from \textit{DiWheelDrive} board. The shell which was already mentioned is being managed by this board. Every sensor that will be used is waken up and the communications protocols for each one is started. It is also in this code where all the threads are being started. The threads are:
@@ -340,6 +389,15 @@ The motor control thread is constantly updating the increments of velocity, the 
 
 Lastly, the user thread of the \textit{DiWheelDrive} is a complete line following application that makes AMiRo able to follow a black line on the ground that is over a white surface.
 
+The overall structure from the \textit{DiWheelDrive} project can be seen in figure \ref{fig:DWDclassOS} where the sensors are broadcasting their values at once to the CAN bus. Also, as discussed before, the ControllerAreaNetworkRx.cpp is constantly monitoring the CAN bus for commands that would like to calibrate or select a desired end value in the encoders and the motors, but also for controlling the motors themselves.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{DWDclass_OS}
+    \caption{DiWheelDrive broad class diagram of AMiRo OS}
+    \label{fig:DWDclassOS}
+\end{figure}
+
 \subsubsection{Power Management project}
 The \textit{Power Management} project follows the same structure mentioned for the \textit{DiWheelDrive}, with a \textit{main.cpp} and its own \textit{global.hpp}. The instance of the global class is also called \textit{robot} and also can be accessed from the \textit{main.cpp}. The list of the threads of the \textit{Power Management} is as follows:
 
@@ -357,6 +415,14 @@ The power status thread receives help of the ADC thread which constantly monitor
 
 The user thread of the \textit{Power Management} is an obstacle avoidance application for the AMiRo which also sends commands via CAN to the \textit{DiWheelDrive} in order to stop the AMiRo or stir it in order to stop it from crashing.
 
+The overall structure from the \textit{PowerManagement} project can be seen in figure \ref{fig:PMclassOS} where the sensors are broadcasting their values at once to the CAN bus. Also, as discussed before, the ControllerAreaNetworkRx.cpp is constantly monitoring the CAN bus for commands that would like to calibrate the proximity ring sensors.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{PMclass_OS}
+    \caption{PowerManagement broad class diagram of AMiRo OS}
+    \label{fig:PMclassOS}
+\end{figure}
 
 \subsubsection{Light Ring project}
 Finally the \textit{Light Ring} project is the simplest of the three projects, it follows the same structure mentioned for the \textit{DiWheelDrive} and \textit{Power Management}, with a \textit{main.cpp} and its own \textit{global.hpp}. The instance of the global class is also called \textit{robot} and also can be accessed from the \textit{main.cpp}. The list of the threads of the \textit{Light Ring} is as follows:
@@ -373,8 +439,14 @@ The LEDs thread is constantly refreshing the LEDS with the preset brightness val
 
 The user thread of the \textit{Light Ring} has no implemented application and remains open for the user to assign one.
 
-%QUIZAS PONER IMAGENES
+The overall structure from the \textit{LightRing} project can be seen in figure \ref{fig:LRclassOS} where the sensors are broadcasting their values at once to the CAN bus. Also, as discussed before, the ControllerAreaNetworkRx.cpp is constantly monitoring the CAN bus for commands that would like to set the LEDs to a certain color and to adjust the brightness.
 
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth]{LRclass_OS}
+    \caption{LightRing broad class diagram of AMiRo OS}
+    \label{fig:LRclassOS}
+\end{figure}
 
 %\clearpage
 \chapter{DA\_AMiRo software architecture}
@@ -502,6 +574,7 @@ There are three ways or modes in which a command can ask for data from a sensor.
 \end{figure}
 
 For example for starting publisher of the magnetometer 'x' axis, with normal priority, the CAN id should be composed by:
+
 \begin{itemize}
 	\item C\_S bit set to '0' on binary
 	\item Priority set to '10' on binary
@@ -870,14 +943,14 @@ In this section the performance of the AMiRo will be revised based the results o
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth, height=19cm]{standalone_1}
+	\includegraphics[width=\textwidth, height=15cm]{standalone_1}
   	\caption{Demo Standalone results part 1}
   	\label{fig:res1}
 \end{figure}
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth, height=16cm]{standalone_2}
+	\includegraphics[width=\textwidth, height=18cm]{standalone_2}
   	\caption{Demo Standalone results part 2}
   	\label{fig:res2}
 \end{figure}
@@ -889,12 +962,13 @@ In this section the performance of the AMiRo will be revised based the results o
   	\label{fig:res3}
 \end{figure}
 
-In figure \ref{fig:ressend} the process described in figures \ref{fig:timing1} and \ref{fig:timing2} can be seen as how the results were displayed. In figure \ref{fig:res1} the values of the accelerometer and the proximity ring sensors are displayed, as well as the power status. In figure \ref{fig:res2} values for the magnetometer, gyroscope, velocity, and encoders are displayed. And finally in figure \ref{fig:res3} the power status gets shown again and also the proximity floor sensors are displayed.
+In figure \ref{fig:ressend} the process described in figures \ref{fig:timing1} and \ref{fig:timing2} is shown and it displays the expected behavior of the \textit{Demo Standalone Reflective Operator}. This figure also have time stamps corresponding to the time at which each CAN frame was sent to the CAN bus. Among the listing of commands that are sent to the CAN bus by this application, the reader can also look at the actuators commands such as the motor's velocity and the turning on and off of the LEDs.
 
-As it can be seen, the delay between two proximity ring sensors, there is a delay
+Now lets have a look at the results. In figure \ref{fig:res1} the values of the accelerometer and the proximity ring sensors are displayed. In figure \ref{fig:res2} values for the magnetometer, gyroscope, velocity, and encoders are displayed. The velocity and encoder CAN frames show that the motors were on-going at the moment of the CAN frame being sent. And finally in figure \ref{fig:res3} the power status gets shown, the magnetometer values appear as well, and also the proximity floor sensors are displayed.
 
+The functionality and frequency of the expected values is very satisfactory, because the delays between every value from the same sensor are exactly as the requested in the \textit{Demo Standalone Reflective Operator} seen in figure \ref{fig:ressend}. And even though as seen on top of figure \ref{fig:res2}, the CAN frames for the magnetometer values are not sent in a row but the value of the velocity gets sent before the magnetometer 'y' value. This behavior is expected as it adheres to the requested frequencies. In the case from the velocities requested frequency, the $900ms$ between two velocity CAN frames is precise.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%FALTAAAAAAAAAAAAAAAAAAAAAAAAA
+As it can be seen, the delay between two CAN frames of the same sensor, correspond to the frequencies requested from the \textit{Demo Standalone Reflective Operator} as seen in figure \ref{fig:ressend}. There is however, an expected delay between the sensors that get sent together in different CAN frames. Such is the case of the magnetometer values, that are sent in three different CAN frames and the proximity floor ring sensors that are sent in eight different CAN frames as explained in section \ref{sub:sensors}. This delay is of $20ms$ and affects only the frequencies of said  sensor values. So for example if the magnetometer value gets requested at a period of time shorter than every $20ms$, then the CAN frames will not be sent appropriately. This delay does not affect other possible parallel tasks.
 
 For starters, lets look into the DA\_AMiRo efficiency. From the programming of the three basic boards, a $545\mu s$ delay of timeouts in every transmission is expected. This number can be explained with the following equation: $$1 us   (1+11+1+1+1+4+64+15+1+1+1+7)*5= 545 us$$ $$1/(1MHz)*(SOF+ID+RTR+IDE+RES+DLC+DATA+CRC+$$ $$DELIM+ACK+DELIM+EOF)*No. RETRIES$$
 taken from the original code of the repository \cite{AMiRo_Wiki}.
@@ -902,11 +976,8 @@ taken from the original code of the repository \cite{AMiRo_Wiki}.
 \section{DA\_AMiRo vs. AMiRo OS}
 In this section the structure and functionality of the AMiRo OS and the OCM approach for the DA\_AMiRo project are compared.
 
-
-
 \section{Outlook}
-The DA\_AmiRo's computational power is too big regarding the current application, this means that there is a lot of computational power that the project is not using.
-
+The DA\_AmiRo's computational power is too big regarding the current application, this means that there is a lot of computational power that the project is not using. There are also a lot of tasks being used in the current DA\_AMiRo project.
 
 %bibliography
 \printbibliography
