@@ -60,7 +60,7 @@ Uwe Jahn
 \listoftables
 
 \begin{abstract}
-This work covers the entire functionality of the internal controller assigned to the DA\_AMiRo project. The architecture of the AMiRo-OS is briefly discussed and it is then explained how the three boards of the AMiRo talk to each other. After the AMiRo-OS has been reviewed and briefly analyzed, the implemented version of the OCM based architecture in the DA\_AMiRo is explained thoroughly. All the code for the DA\_AMiRo can be found in the gitlab repository and the Wiki page. One of the purposes of the DA\_AMiRo project is to compare its functionality with the previous AMiRo-OS project conducted by Thomas Schöpping. The reader can get more information about the previous AMiRo-OS at the original repository \cite{AMiRo_Wiki}. This work will finalize with a comparison on both systems.
+This work covers the entire functionality of the internal controller assigned to the DA\_AMiRo project. The architecture of the AMiRo OS is briefly discussed and it is then explained how the three boards of the AMiRo talk to each other. After the AMiRo OS has been reviewed and briefly analyzed, the implemented version of the OCM based architecture in the DA\_AMiRo is explained thoroughly. All the code for the DA\_AMiRo can be found in the gitlab repository and the Wiki page. One of the purposes of the DA\_AMiRo project is to compare its functionality with the previous AMiRo OS project conducted by Thomas Schöpping. The reader can get more information about the previous AMiRo OS at the original repository \cite{AMiRo_Wiki}. This work will finalize with a comparison on both systems.
 \end{abstract}
 \pagenumbering{arabic}
 
@@ -104,7 +104,7 @@ The second layer is called the reflective operator. It is in this layer where th
 
 The third layer is the Cognitive Operator. On this layer the system gathers information about itself and its environment to improve itself. This recollection of information can be done by applying various methods such as learning and model-based optimization among others. In other words, it is in this layer where the self-improvement takes place \cite{ocmAuto}.
 
-This project compares the AMiRo-OS with the OCM based architecture of the DA\_AMiRo. The controller is the responsible for commanding the internal sensors of the STM32F32 boards inside DA\_AMiRo in real-time. This sensor information is then retrieved by the Reflective operator board with a demo application that will be explained later in this document inside section \ref{sect:example}.
+This project compares the AMiRo OS with the OCM based architecture of the DA\_AMiRo. The controller is the responsible for commanding the internal sensors of the STM32F32 boards inside DA\_AMiRo in real-time. This sensor information is then retrieved by the Reflective operator board with a demo application that will be explained later in this document inside section \ref{sect:example}.
 
 \section{AMiRo}
 The AMiRO project, which stand for Autonomous Mini Robot was started in the University of Bielefeld by Stefan Herbrechtsmeier and worked by Thomas Schöpping in collaboration with few others. The motivation for this project was to use small embedded systems in order to create a small robot that is easy to transport, usable on a table or the floor, appealing for young people, that is created with a modular approach is able to be extendable and customizable. With all of these aspects in mind, the result should be also a powerful tool for research and education \cite{AMiRo_ppt_v1}.
@@ -976,8 +976,20 @@ taken from the original code of the repository \cite{AMiRo_Wiki}.
 \section{DA\_AMiRo vs. AMiRo OS}
 In this section the structure and functionality of the AMiRo OS and the OCM approach for the DA\_AMiRo project are compared.
 
+The AMiRo OS is a very complete system that has a lot of possible applications for different purposes, from line followers, to a LIDAR that can detect obstacles. It also has a command line shell in which the user can communicate with the AMiRo in very simple commands. This feature is very helpful to get an immediate status of a sensor or to get a quick response from the AMiRo.
+
+Every board has a user thread where a functionality using the sensors of the board is implemented. Everyone of these boards gets to broadcast its sensor values via CAN with a pre-selected frequency. A good way the user can interact with the sensors and the boards themselves, is via the \textit{Cognition Board} that also has pre-compiled demos in the Wiki \cite{AMiRo_Murox} for different possible applications.
+
+The AMiRo OS has all of the possible functionalities already implemented and this takes a lot of the processing power from the boards, this is one of the main differences between this and the DA\_AMiRo project. The latter has a specific purpose and the processing power is focused towards this goal, making it more resource effective. A good example of this is that the DA\_AMiRo does not have possible demos implemented like the line follower, the motor corrections, and the obstacle avoidance for mentioning a few.
+
+What appears to be similar between these two projects is the CAN broadcasting of the AMiRo OS and the CAN sensor handler of the DA\_AMiRo project. The AMiRo OS sends the values of the sensors all together via the CAN bus at a specific frequency of $16Hz$, while the DA\_AMiRo project has a much more complex sensor value handling as it has been already explained through the past chapters.
+
+One of the biggest advantages of the DA\_AMiRo project is the compatibility of the Simulink models from Matlab to generate applications for the Reflective Operator of the AMiRo. The students can easily edit the given model to operate according a desired goal. This method is easy because with the Simulink model the students can change logic in a visual fashion rather than a code one. Instead of having to remember the CAN frame conventions or worrying about a programming language issue, they can simply change the values of the model or create logic with simple block logic in Simulink.
+
 \section{Outlook}
-The DA\_AmiRo's computational power is too big regarding the current application, this means that there is a lot of computational power that the project is not using. There are also a lot of tasks being used in the current DA\_AMiRo project.
+The DA\_AMiRo's results are meeting the deadlines of the requested frequencies. It also can handle all the tasks from the sensors at once, and communicates successfully with the actuators, changing its values at the will of the user. On top of this, the DA\_AMiRo project is in accordance to the CAN frame conventions established by Uwe Jahn.
+
+With the help of the Simulink models, the usage of the Reflective Operator becomes very simple. This feature makes the DA\_AMiRo project a good tool for students to work with real-time systems and learn from them in a simple way.
 
 %bibliography
 \printbibliography
