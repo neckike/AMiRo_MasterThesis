@@ -60,13 +60,14 @@ Uwe Jahn
 \listoftables
 
 \begin{abstract}
-This work covers the entire functionality of the internal controller assigned to the DA\_AMiRo project. The architecture of the AMiRo OS is briefly discussed and it is then explained how the three boards of the AMiRo talk to each other. After the AMiRo OS has been reviewed and briefly analyzed, the implemented version of the OCM based architecture in the DA\_AMiRo is explained thoroughly. All the code for the DA\_AMiRo can be found in the gitlab repository and the Wiki page. One of the purposes of the DA\_AMiRo project is to compare its functionality with the previous AMiRo OS project conducted by Thomas Schöpping. The reader can get more information about the previous AMiRo OS at the original repository \cite{AMiRo_Wiki}. This work will finalize with a comparison on both systems.
+The objective of this project is to develop and implement a software architecture that fulfills the real-time system requirements. The development and implementation are done for the Autonomous Mini Robot or AMiRo. This thesis starts discussing the hardware structure of the robot, and the review and analysis of the AMiRo OS that was done in the University of Bielfield. The AMiRo OS was replaced by a software solution that uses the \textit{Operator Controller Module} approach. This software solution is called the DA\_AMiRo project and it discussed over the next few chapters as it is the main part of the thesis. The purpose of this software architecture is to build a real-time scheduler for the values of the sensors and actuators that AMiRo has and are communicated via the Controller Area Network protocol. There are also some sample applications and demos that show the functionality of the DA\_AMiRo. The thesis ends with a comparison between the AMiRo OS and the DA\_AMiRo project. The entire DA\_AMiRo project can be found in the gitlab repository \cite{AMiRo_Git}. As for the AMiRo OS project, the reader can also get access to the complete codes in the AMiRo Wiki \cite{AMiRo_Wiki}.
+
 \end{abstract}
 \pagenumbering{arabic}
 
 \chapter{Introduction}
 \section{Real-time Operating Systems}
-The necessity to meet deadlines in today's projects is every time more demanded. Most applications consist of different tasks that can be executed in parallel, have different priority, have different period repetition, and frequently use shared resources. Using a multi-threading approach, however,  can create a challenge in terms of performance, stability and time of implementation.
+The necessity to meet deadlines in today's projects is growing constantly. Most applications consist of different tasks that can be executed in parallel, have different priority, have different repetition period, and frequently use shared resources. Using a multi-threading approach, however, can create a challenge in terms of performance, stability and time of implementation.
 
 An operating system is a software component of a computer system that is responsible for the management and coordination of activities and the sharing of the resources of the computer \cite{mcgraw}. "A real-time operating system perform these tasks, but is designed to run applications with a very precise timing and a high degree of reliability. This can be especially important in measurement and automation systems where downtime is costly or a program delay could cause a safety hazard" \cite{rtos}.
 
@@ -86,7 +87,7 @@ Some of the main characteristics of a RTOS are the following:
 
 \section{Operator Controller Module}
 
-The DA\_AMiRo is based on the OCM \cite{ocmAuto} software architecture approach. In this structure there are three basic controllers: Internal Controller, Reflective Operator, and Cognitive Operator. In order to have a more precise overview of how these three controllers work, figure \ref{fig:ocm} is explained by a direct quote from the Wiki:
+The DA\_AMiRo software architecture is based on the OCM \cite{ocmAuto} software architecture approach. In this structure there are three basic controllers: Internal Controller, Reflective Operator, and Cognitive Operator. In order to have a more precise overview of how these three controllers work, figure \ref{fig:ocm} is explained by a direct quote from the Wiki:
 
 \say{Refering to figure \ref{fig:ocm}, the Controllers (red) are used to connect all sensors and actuators. The Controllers need to be configured and programmed once, so the software on the controllers is mostly fixed and does not need to be flexible. The Reflective Operator(s) (yellow) control the Controllers. The Reflective Operator's software is the adaptable part of the distributed system - it changes from application to application. These Operator Controller Module(s) are located on the robot itself and let it act autonomously. The Cognitive Operator is hosted on a server and is used to optimize, program and interact with the user. The Cognitive Operator is connected via a wireless connection and can (only) interact with the Reflective Operator(s).}\cite{DAEbot_Wiki}.
 
