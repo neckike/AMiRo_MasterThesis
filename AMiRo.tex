@@ -156,12 +156,12 @@ This board has two motors of 1W DC. The purpose of having two motors is to be ab
 
 As mentioned before, the DiWheelDrive board has a Cortex-M3 MCU for calculating such things as motion control, odometry, and dead reckoning algorithms at high sampling rates \cite{AMiRo_paper_modular}. This board can be accessed by the other boards via the Controller Area Network protocol or via USB UART interface directly with the user. It is important to mention that every board has also a USB UART interface to communicate directly with the user but all of them are covered by the chassis except for the DiWheelDrive board \cite{AMiRo_paper_modular}.
 
-The \textit{DiWheelDrive} board ready to be mounted into the robot can be seen in figure \ref{fig:diwheel}. In this figure the board can be seen from both, the top and the bottom perspective.
+The \textit{DiWheelDrive} board ready to be mounted into the robot can be seen in figure \ref{fig:diwheel}. In this figure the board can be seen from both, top and bottom perspectives.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{DiWheel_real}
-    \caption{Top and bottom view of the DiWheelDrive board \cite{AMiRo_ppt_v1}.}
+    \caption{Top and bottom view respectively of the DiWheelDrive board \cite{AMiRo_ppt_v1}.}
     \label{fig:diwheel}
 \end{figure}
 \clearpage
@@ -169,7 +169,7 @@ The \textit{DiWheelDrive} board ready to be mounted into the robot can be seen i
 \subsubsection{Gyroscope}
 The gyroscope is a sensor that measures rotational motion. The units of the resulting measurement are revolutions per second or degrees per second. As a quick example, in a balancing robot a gyroscope can be used to measure how much the robot has rotated from the desired position and this information can be sent to an actuator to make corrections in order to reach the desired angle \cite{gyrostheory}. A gyroscope normally consists of a mass that moves with constant angular momentum, so when the gyroscope is tilted the axis of rotation of said mass reacts to the applied rotational movements making the axis of rotation tilt. This tilting leads to a displacement of the capacitance fingers inside the sensor which changes the capacitance. Finally when compared to a reference capacitance level, the angular velocity can be determined \cite{AMiRo_ppt_v1}.
 
-The gyroscope used in the DiWheelDrive board is the l3g4200d from STMicroelectronics. This sensor communicates via SPI with the processor. This sensor is configured to have a resolution of $+/-500 dps$ in accordance with the user's manual \cite{gyroscopepart} and it is possible to obtain the output in degrees per second, micro degrees per second, revolutions per second, and micro revolutions per second with the actual code. The actual units are degrees per second but the user can easily change the output selecting a different function from \textit{updateSensorVal()} function inside DiWheelDrive.cpp. For a more clear explanation on the code structure, see section \ref{AMiRo_OS}. The sensor communicates with the processor via SPI communication.
+The gyroscope used in the DiWheelDrive board is the l3g4200d from STMicroelectronics. This sensor communicates via SPI with the processor. This sensor is configured to have a resolution of $+/-500 dps$ in accordance with the user's manual \cite{gyroscopepart} and it is possible to obtain the output in degrees per second, micro degrees per second, revolutions per second, and micro revolutions per second with the current code. The actual units are degrees per second but the user can easily change the output selecting a different function from \textit{updateSensorVal()} function inside DiWheelDrive.cpp. For a more clear explanation on the code structure, see section \ref{AMiRo_OS}. The sensor communicates with the processor via SPI communication.
 
 \subsubsection{Accelerometer}
 The accelerometer is a sensor that measures the acceleration of an object. The units of the resulting measurement are meters per squared second or in g forces, where g as a unit equals $9.81 m/s^2$ \cite{accelerometertheory}. It is typically a system composed by a mass, a spring, and a damper. The mass moves according to the applied acceleration and changes the resulting capacitance that can be sent as an output for further reading and processing \cite{AMiRo_ppt_v1}.
@@ -177,13 +177,13 @@ The accelerometer is a sensor that measures the acceleration of an object. The u
 The accelerometer used in the DiWheelDrive board is the lis331dlh from STMicroelectronics. This sensor is configured be scaled with a $+/-8g$ factor in accordance with the user's manual \cite{accelerometerpart}. The output is in g units and the sensor is being communicated via SPI with the processor.
 
 \subsubsection{Magnetometer}
-The magnetometer is a sensor that measures the magnetic field for all three physical axes \cite{magnetometertheory}. This sensor works thanks to three principles. The first one is called the Anisotropic magneto resistance effect discovered in 1857 by William Thomson, in which an external magnetic field can make the sensor change the electrical resistance of a ferromagnetic material. The electrical resistance will be at a maximum value when the direction of the electrical current is parallel to said magnetic field \cite{AMiRo_ppt_v1}.
+The magnetometer is a sensor that measures the magnetic field for all three physical axes \cite{magnetometertheory}. This sensor works thanks to three principles. The first one is called the \textit{Anisotropic magneto resistance effect} discovered in 1857 by William Thomson, in which an external magnetic field can make the sensor change the electrical resistance of a ferromagnetic material. The electrical resistance will be at a maximum value when the direction of the electrical current is parallel to said magnetic field \cite{AMiRo_ppt_v1}.
 
-The second principle is called Fluxgate and it is a way of calculate the vectorial measurement of a magnetic field invented by Friedrich Förster in 1937. The method starts with two cores wrapped by two coils of wire. There should be an electrical current driving the core through cycles of magnetic saturation. The resulting electrical current of the second coil will depend on the external magnetic field \cite{AMiRo_ppt_v1}.
+The second principle is called \textit{Fluxgate} and it is a way of calculate the vectorial measurement of a magnetic field invented by Friedrich Förster in 1937. The method starts with two cores wrapped by two coils of wire. There should be an electrical current driving the core through cycles of magnetic saturation. The resulting electrical current of the second coil will depend on the external magnetic field \cite{AMiRo_ppt_v1}.
 
-The last principle is called the Hall effect discovered in 1897 by Edwin Hall. In this principle can be visible when an electric current flows through a conductor in a magnetic field, the magnetic field will exert a transverse force on the moving charge carriers which tends to push them to one side of the conductor. The result is a voltage difference between both sides of the conductor \cite{halleffect}.
+The last principle is called the \textit{Hall effect} discovered in 1897 by Edwin Hall. In this principle can be visible when an electric current flows through a conductor in a magnetic field, the magnetic field will exert a transverse force on the moving charge carriers which tends to push them to one side of the conductor. The result is a voltage difference between both sides of the conductor \cite{halleffect}.
 
-The magnetometer used in the DiWheelDrive board is the hmc5883l from STMicroelectronics. This sensor is configured to have a field resolution of $+/-5Gauss$ according to the user's manual \cite{magnetometerpart} and the current output is set to be in Gauss units. The sensor is being communicated via I2C protocol with the processor.
+The magnetometer used in the DiWheelDrive board is the hmc5883l from STMicroelectronics. This sensor is configured to have a field resolution of $+/-5Gauss$ according to the user's manual \cite{magnetometerpart} and the current output is set to be in micro Gauss units. The sensor is being communicated via I2C protocol with the processor.
 
 \subsubsection{Floor Proximity Sensor}
 \label{sec:AMS}
@@ -207,12 +207,12 @@ The Power Management board is the central basic module of AMiRo. This board is r
 
 There are two lithium-ion batteries connected to the Power Management board that power the whole system, and there are also some sensors on this board. Among the sensors that this board has, the ones that are being used by this project are: eight proximity sensors that act as proximity sensors and also as ambient light sensors, sensors for knowing if the charging cable is connected, the remaining battery charge or the time for a complete battery charge, the time for this both events to be completed, and the actual current consumption  \cite{AMiRo_paper_modular}.
 
-The \textit{PowerManagement} board ready to be mounted into the robot can be seen in figure \ref{fig:powerm}. In this figure the board can be seen from both, the top and the bottom perspective.
+The \textit{PowerManagement} board ready to be mounted into the robot can be seen in figure \ref{fig:powerm}. In this figure the board can be seen from both, top and bottom perspectives.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{power_real}
-    \caption{Top and bottom view of the Power Management board \cite{AMiRo_ppt_v1}.}
+    \caption{Top and bottom view respectively of the Power Management board \cite{AMiRo_ppt_v1}.}
     \label{fig:powerm}
 \end{figure}
 \clearpage
@@ -223,7 +223,7 @@ For the tracking of the power status, AMiRo is equipped with a bq27500 Impedance
 \subsubsection{Proximity Ring}
 As seen in section \ref{sec:AMS}, the eight vcnl4020 sensors in connected to the Power Management board are functioning as ambient light sensors and also as proximity sensors. For this last functionality, the sensor has a built-in infrared emitter and photo-pin-diode, having a maximum relying measurement of 200mm \cite{proxsensor}. These sensors are connected in a ring-fashion way so that the AMiRo has eight sensors throughout its entire circumference, making it able to detect obstacles in all horizontal directions. The units of the output are also in mm.
 
-The \textit{Proximity Ring} ready to be mounted into the robot can be seen in figure \ref{fig:proxring}. The proximity ring attaches to the \textit{Power Management} board as mentioned before.
+The \textit{Proximity Ring} ready to be mounted into the robot can be seen in figure \ref{fig:proxring}. The proximity ring gets attached to the \textit{Power Management} board as mentioned before.
 
 \begin{figure}[ht]
 	\centering
@@ -234,39 +234,39 @@ The \textit{Proximity Ring} ready to be mounted into the robot can be seen in fi
 \clearpage
 
 \subsection{Light Ring}
-The Light Ring board is the top-most board in the AMiRo. This board has a STMicroelectronics ARM Cortex-M3 based STM32F103 MCU. It contains eight RGB LEDs arranged in a circular way corresponding to the Proximity Ring discussed in last section. These LEDs can be set from the Cognition board, setting each color of the RGB channels \cite{AMiRo_paper_modular}.
+The Light Ring board is the top-most board in the AMiRo. This board has a STMicroelectronics ARM Cortex-M3 based STM32F103 MCU. It contains eight RGB LEDs arranged in a circular way corresponding to the Proximity Ring discussed in last section. The LEDs can be set from the Cognition board, setting each color of the RGB channels \cite{AMiRo_paper_modular}.
 
-The \textit{LightRing} board ready to be mounted into the robot can be seen in figure \ref{fig:lightr}. In this figure the board can be seen from both, the top and the bottom perspective. As it can be seen in the image, the LEDs are positioned equidistant in a circular fashion. This board is the upmost board which is covered by a translucent material, allowing the user to see the colors of the LEDs.
+The \textit{LightRing} board ready to be mounted into the robot can be seen in figure \ref{fig:lightr}. In this figure the board can be seen from both, top and bottom perspectives. As it can be seen in the image, the LEDs are positioned equidistant in a circular fashion. This board is the upmost board which is covered by a translucent material, allowing the user to see the colors of the LEDs.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{light_real}
-    \caption{Top and bottom view of the Light Ring board \cite{AMiRo_ppt_v1}.}
+    \caption{Top and bottom view respectively of the Light Ring board \cite{AMiRo_ppt_v1}.}
     \label{fig:lightr}
 \end{figure}
 \clearpage
 
 \subsection{Cognition Board}
 \label{sub:cogn}
-This board was thought as an extension board which is no longer from the basic set of boards that make the AMiRo. The Cognition board in this project is being compared with the Reflective Operator of the DA\_AMiRo project according to the OCM model. It provides all of the high-level tasks, gathering and coordinating the information generated in the three basic boards also known as the internal controller \cite{AMiRo_paper_modular}.
+This board was thought as an extension board which is no longer from the basic set of boards that make the AMiRo. The \textit{Cognition board} is being used as the Reflective Operator of the DA\_AMiRo project according to the OCM model. It provides the high-level functionality, gathering and coordinating the information via CAN that is generated in the three basic boards also known as the internal controller \cite{AMiRo_paper_modular}.
 
-The most important feature of this board is the attached Gumstix Overo Computer-on-Module. In the current setup, the Overo TidalSTORM COM is being used, which combines an ARM Cortex-A8 based DaVinci DM3730 SoC from Texas Instruments \cite{AMiRo_paper_modular}. This board has the same serial programming port as on the three basic boards. It also has a Type A, a micro-AB, and an internal pin header USB interfaces \cite{AMiRo_paper_modular}.
+The most important feature of this board is the attached Gumstix Overo Computer-on-Module. In the current setup, the Overo TidalSTORM COM is being used, which combines an ARM Cortex-A8 based DaVinci DM3730 SoC from Texas Instruments \cite{AMiRo_paper_modular}. This board has the same serial programming port as on the three basic boards. Additionally, the board has also a Type A, a micro-AB, and an internal pin header USB interfaces \cite{AMiRo_paper_modular}.
 
 The operating system running on the Overo COM is based on the Linux Yocto reference distribution Poky \cite{poky}, and the way it communicates with the three basic boards is through CAN, using a simple SocketCAN software-wrapper that is offered by this distribution \cite{AMiRo_paper_modular}.
 
-The \textit{Cognition} board ready to be mounted into the robot can be seen in figure \ref{fig:cogb}. In this figure the board can be seen from both, the top and the bottom perspective.
+The \textit{Cognition} board ready to be mounted into the robot can be seen in figure \ref{fig:cogb}. In this figure the board can be seen from both, the bottom and the top perspectives.
 
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth]{cognition_real}
-    \caption{Top and bottom view of the Cognition board \cite{AMiRo_ppt_v2}.}
+    \caption{Bottom and top view respectively of the Cognition board \cite{AMiRo_ppt_v2}.}
     \label{fig:cogb}
 \end{figure}
 \clearpage
 
 \section{Software Architecture of AMiRo OS}
 \label{sec:soft}
-As it has been discussed in previous sections, the AMiRo project was started back in 2015 and it is still being maintained. The version 1.0 of the repository was the base used for this project \cite{AMiRo_Git}.
+As it has been discussed in previous sections, the AMiRo project was started back in 2015 and it is still being maintained. The version 1.0 of the project is the one from which this thesis is based on \cite{AMiRo_Git}.
 
 \subsection{AMiRo bootloader}
 \label{sub:btl}
@@ -275,7 +275,7 @@ The open-source bootloader for MCUs is the bootstrap for the three basic boards 
 As said before, the DiWheelDrive is the only module of which the programming port can be accessed by the user. This is why new software is applied to the two other basic boards by remote flashing via OpenBLT. Using CAN communication the new binary is forwarded by the DiWheelDrive board so that the target board receives the data and stores it in its flash memory \cite{AMiRo_paper_modular}.
 
 \subsection{AMiRo real-time operating system kernel}
-For the real-time operating system the open-source ChibiOS was chosen. This project aims at creating a portable, light weight, and fast real-time operating system for embedded applications \cite{chibioshp}. ChibiOS not only provides low-level drivers for all interfaces of the most common microcontrollers, it also gives an unified hardware abstraction layer, priority based preemptive scheduling, and high-performance event and message passing systems. ChibiOS can be configured statically and dynamically to exactly fit the application in order to maximize efficiency and performance \cite{AMiRo_paper_modular}.
+The real-time operating system that is being used is the open-source ChibiOS. This project aims at creating a portable, light weight, and fast real-time operating system for embedded applications \cite{chibioshp}. ChibiOS not only provides low-level drivers for all interfaces of the most common microcontrollers, but it also gives an unified hardware abstraction layer, priority based preemptive scheduling, and high-performance event and message passing systems. ChibiOS can be configured statically and dynamically to exactly fit the application in order to maximize efficiency and performance \cite{AMiRo_paper_modular}.
 
 \subsubsection{ChibiOS}
 Some of the main characteristics from ChibiOS are:
