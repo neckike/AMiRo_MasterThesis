@@ -1,7 +1,6 @@
 %IMPORTANT!!!!!! remember to abilitate twoside, openright to print document.
-%remember the clearpages for editing better.
 
-\documentclass[12pt]{report}%, twoside, openright]{report}
+\documentclass[12pt]{report} %twoside, openright]{report}
 \usepackage[english]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
@@ -473,13 +472,13 @@ Finally, the folder \textit{Documentation} has some of the scientific papers and
 
 \section{DA\_AMiRo Operating System's functionality}
 \label{sub:DAAMIROOS}
-In this section, the functionality of the DA\_AMiRo Operating System from figure \ref{fig:OS} will be addressed.
+In this section, the functionality of the DA\_AMiRo Operating System from figure \ref{fig:OS} is addressed.
 
-The DiWheelDrive board, the DiWheelDrive class inherits from both ControllerAreaNetworkRx.cpp and from ControllerAreaNetworkTx.cpp, making it capable of sending and receiving CAN frames. This happens exactly the same in the three boards. The CAN frame structure will be further discussed in chapter \ref{chap:CAN}. The DiWheelDrive class also implements the functions for updating each of the sensor's values and sending independently the data via CAN interface. As it can be seen in figures \ref{fig:DWDclass}, \ref{fig:PMclass}, and \ref{fig:LRclass}, DiWheelDrive has virtual functions of every sensor including the Power Management board and also the Light Ring board. These functions however, have a '= 0' which means that they are not being implemented in this specific class. Similarly in the other two boards the same thing happens with their own set of sensors.
+In the \textit{DiWheelDrive} board, the  \textit{DiWheelDrive} class inherits from both ControllerAreaNetworkRx.cpp and from ControllerAreaNetworkTx.cpp, making it capable of sending and receiving CAN frames. This happens exactly the same in the three boards. The CAN frame structure will be further discussed in chapter \ref{chap:CAN}. The  \textit{DiWheelDrive} class also implements the functions for updating each of the sensor's values and sending independently the data via CAN interface. As it can be seen in figures \ref{fig:DWDclass}, \ref{fig:PMclass}, and \ref{fig:LRclass},  \textit{DiWheelDrive} has virtual functions of every sensor including the Power Management board and also the Light Ring board. These functions however, have a '= 0' which means that they are not being implemented in this specific class. Similarly in the other two boards the same thing happens with their own set of sensors.
 
-This means that in the DiWheelDrive class, the functions that are being implemented correspond to the gyroscope, accelerometer, magnetometer, proximity sensors, motors, and encoders. In the Power Management class the implemented functions include proximity sensors and power status sensors, and in the Light Ring class the implemented function concerns only the LEDs for the purposes of DA\_AMiRo.
+This means that in the  \textit{DiWheelDrive} class, the functions that are being implemented correspond to the gyroscope, accelerometer, magnetometer, proximity sensors, motors, and encoders. In the \textit{Power Management} class the implemented functions include proximity sensors and power status sensors, and in the \textit{Light Ring} class the implemented function concerns only the LEDs for the purposes of DA\_AMiRo.
 
-The global class is the responsible for creating each object from each sensor and encapsulating them under the name of 'robot'. This makes the \textit{robot's} attributes accessible from other classes. This means that, for example, the gyroscope's value can be updated and outputted as a part of \textit{robot} from other parts of the code. The global object is finally initialized in the main function, as well as the threads responsible for managing the scheduler of the sensor's data but this subject will be discussed more deeply in chapter \ref{chap:sensorDH}.
+As said before, the global class is the responsible for creating each object from each sensor and encapsulating them under the name of 'robot'. This makes the \textit{robot's} attributes accessible from other classes. This means that for example, the gyroscope's value can be updated and outputted as a part of \textit{robot} from other parts of the code. The global instance is finally initialized in the main function, as well as the threads responsible for managing the scheduler of the sensor's data but this subject will be discussed more deeply in chapter \ref{chap:sensorDH}.
 
 \begin{figure}[ht]
 	\centering
@@ -504,15 +503,15 @@ The global class is the responsible for creating each object from each sensor an
 
 \chapter{Controller Area Network}
 \label{chap:CAN}
-This chapter explains how to receive and transmit CAN frames in the AMiRo. The functionality of the CAN module had to be merged with the current ControllerAreaNetworkRx.cpp and ControllerAreaNetworkTx.cpp of the existing repository of AMiRo \cite{AMiRo_Wiki}. The ControllerAreaNetwork.h however, is the same for the internal controller and for the \textit{Reflective Operator}. The reason behind sharing the ControllerAreaNetwork.h among projects is to be able to use a single set of definitions for names of sensors and some structures.
+This chapter explains how AMiRo receives and transmits CAN frames. The functionality of the CAN module had to be merged with the current ControllerAreaNetworkRx.cpp and ControllerAreaNetworkTx.cpp of the existing repository of AMiRo \cite{AMiRo_Wiki}. The ControllerAreaNetwork.h however, is the same for the internal controller and for the \textit{Reflective Operator}. The reason behind sharing the ControllerAreaNetwork.h among projects is to be able to use a single and global set of definitions for names of sensors and some structures.
 
-For starters, the baud rate requirement of the DA\_AMiRo project was set to 500kHz This frequency was achieved with the following equation, and can be changed from the CANRx and CANtx.cpp files that can be located with help of figure \ref{fig:OS}.
+For starters, the baud rate requirement of the DA\_AMiRo project was set to 500kHz This frequency was achieved with the following equation, and can be changed in the CANRx and CANtx.cpp files that are located with help of figure \ref{fig:OS}.
 
 \begin{equation} \label{eq:baudrate1}
 	500kHz= \frac{8MHz}{(B1+B2+SW)*prescaler}
 \end{equation}
 
-Where the 8MHz is the clock frequency of the STM32F3, the B1 and B2 are the time quanta bit segment one and two accordingly. Finally, the SW represents the maximum time quanta. These values were configured by the previous AMiRo project which also happened to configure the CAN frequency to 500kHz. The values and the names of the variables in the actual code are: $$B1 = CAN\_BTR\_TS1 = 13$$ $$B2 = CAN\_BTR\_TS2 = 2$$ and $$SW = CAN\_BTR\_SJW = 1$$ $$Prescaler = CAN\_BTR\_BRP = 1$$, which results in the following equation:
+Where the 8MHz is the clock frequency of the STM32F3 boards, the B1 and B2 are the time quanta bit segment one and two accordingly. Finally, the SW represents the maximum time quanta. The values and the names of the variables in the actual code are: $$B1 = CAN\_BTR\_TS1 = 13$$ $$B2 = CAN\_BTR\_TS2 = 2$$ and $$SW = CAN\_BTR\_SJW = 1$$ $$Prescaler = CAN\_BTR\_BRP = 1$$, which results in the following equation:
 
 \begin{equation} \label{eq:baudrate2}
 	\frac{8MHz}{(13+2+1)*1} = 500kHz
@@ -521,11 +520,11 @@ Where the 8MHz is the clock frequency of the STM32F3, the B1 and B2 are the time
 \section{Convention used for sending and receiving frames}
 \label{sec:canconv}
 
-The format of the CAN frames was done accordingly with the pre-established convention for the DAEbot project \cite{DAEbot_Wiki} by Uwe Jahn. The format of the standard id from a CAN frame can be seen in figure \ref{fig:can}, where it is basically divided into three main parts. The command or sensor bit is the bit that allows devices on the CAN bus to know if the frame belongs to a command, i.e. knowing the value 'x' axis of the gyroscope, or setting the LEDs to red, or if it belongs to a sensor frame, i.e. the actual value of the 'x' axis of the gyroscope.
+The format of the CAN frames is done accordingly with the pre-established convention for the DAEbot project \cite{DAEbot_Wiki} by Uwe Jahn. The format of the standard id from a CAN frame can be seen in figure \ref{fig:can}, where it is basically divided into three main parts. The command or sensor bit is the bit that allows devices on the CAN bus to know if the frame belongs to a command, e.g. wanting to know the values of the gyroscope's axis, or setting the LEDs to red. In the other hand, if the CAN frame's id belongs to a sensor bit, the CAN frame will contain the actual value of the gyroscope's axis following the same example.
 
-The second part is the priority which allows the devices on the bus know the priority of the command or sensor. If there are two frames in the bus at the same time asking for a sensor value from the same board for example, the priority will allow the system to preempt the frame of the one with higher priority.
+The second part is the priority which allows the devices on the bus know the priority of the command or sensor bit. If there are two CAN frames in the bus at the same time asking for a sensor value from the same board for example, the priority will allow the system to preempt the higher priority task responsible of said sensor value.
 
-The third and last part of the id from the frame is the topic id. The list for the topics can be seen in the ControllerAreaNetwork.h shared by all the devices or also from the ods file inside the same path \textit{Peripheral-Drivers/ControllerAreaNetwork/} from figure \ref{fig:DAAMIROstr}.
+The third and last part of the id from the frame is the topic id. The list for the topics are in the ControllerAreaNetwork.h shared by all the devices. Alternatively the read can also get the topic ids from the ods file inside the same path \textit{Peripheral-Drivers/ControllerAreaNetwork/} from figure \ref{fig:DAAMIROstr}.
 
 \begin{figure}[ht]
 	\centering
@@ -534,7 +533,7 @@ The third and last part of the id from the frame is the topic id. The list for t
     \label{fig:can}
 \end{figure}
 
-For the transmission of a CAN frame, the id is coded according to figure \ref{fig:can} and when a CAN frame is received, the id is decoded into the same structure. The CAN frame pre-established structure can be seen in snip of code \ref{CAN:frame}, which can be compared with the figure \ref{fig:can}. In this structure the only thing that has not been yet discussed is the data itself. The dlc is the number of bytes to be transmitted and the information is stored in the data8, data16 and data32 arrays. Thanks to the \textit{union} of these arrays, the same value can be accessed in different bit sizes.
+For the transmission of a CAN frame, the id is coded according to figure \ref{fig:can} and when a CAN frame is received, the id is decoded into the same structure. The CAN frame pre-established structure can be seen in the snip of code \ref{CAN:frame}, which can be compared with the figure \ref{fig:can}. In this structure the only thing that has not been yet discussed is the data itself. The dlc is the number of bytes to be transmitted and the information is stored in the data8, data16 and data32. Thanks to the \textit{union} of these arrays, the same value can be accessed in different bit sizes.
 
 \begin{minipage}{\linewidth}
 \begin{lstlisting}[caption = CAN frame, label = CAN:frame, language = C, captionpos = b]
@@ -552,11 +551,11 @@ typedef struct can_frame_types {
 \end{lstlisting}
 \end{minipage}
 
-In order to send a CAN frame, can\_transmit\_data\_frame\_pd(...) can be called. When sending a CAN frame, the id is set to be in standard mode. The CAN frame that is sent consists of three main parts: id, DLC, and the data. The id is therefore set with the can\_code\_identifier\_pd(...) function before actually calling the transmit function. This function combines the c\_s bit with the priority bit and then combines that value to the topic ID. The CAN frame is later sent through the CAN driver.
+In order to send a CAN frame, can\_transmit\_data\_frame\_pd(...) can be called. When sending a CAN frame, the id is set to be in standard mode. The CAN frame that is sent consists of three main parts: id, DLC, and the data itself. The id is therefore set with the can\_code\_identifier\_pd(...) function before actually calling the transmit function. This function combines the c\_s bit with the priority bit and then combines that value to the topic ID. The CAN frame is later sent through the CAN driver.
 
-On the CAN reception side, the status of the reception is assigned when calling to the can\_receive\_data\_frame\_pd(...) function. The status of the CAN reception can be successful, timeout, or error. Then the id of the CAN frame gets decoded with the function can\_decode\_identifier\_pd(...) and the data frames are passed into a global structure like in snip of code \ref{CAN:frame}
+On the CAN reception side, the can\_receive\_data\_frame\_pd(...) function is called first. Then the id of the CAN frame gets decoded with the function can\_decode\_identifier\_pd(...) and the data frames are passed into a global structure like in snip of code \ref{CAN:frame}
 
-Note that can\_code\_identifier\_pd(...) and can\_decode\_identifier\_pd(...) are functions that were already implemented beforehand, for this project it was necessary to adjust both functions to operate with the current hardware platform.
+Note that can\_code\_identifier\_pd(...) and can\_decode\_identifier\_pd(...) are functions that were already implemented beforehand in the DAEbot project\footnote{https://gitlab.idial.institute/DAEbot/DAEbot/wikis/home} \cite{DAEbot_Wiki} but for the DA\_AMiRo project it was necessary to adjust both functions to operate with the current hardware platform.
 
 %\clearpage
 \section{Interpreting CAN frames of the sensors}
@@ -565,29 +564,31 @@ In this section it will be explained how to read the frames corresponding to eac
 
 \subsection{Sensors}
 \label{sub:sensors}
-In order to interact with a sensor, the id from the CAN frame's command has to obey the convention shown in figure \ref{fig:can} and its content, the actual data from the CAN frame has to follow the convention shown in figure  \ref{fig:sensormodes} created for the DAEbot project.
+In order to interact with a sensor, the id from the CAN frame's command has to obey the convention shown in figure \ref{fig:can} and its content, the actual data from the CAN frame has to follow the convention shown in figure  \ref{fig:sensormodes} created also by Uwe Jahn.
 
-There are three ways or modes in which a command can ask for data from a sensor. The first one is the mode one which asks for a sensor's data with a specific frequency. The first DLC of the CAN frame has to be set to '1' to activate the publisher mode. The second and third DLCs specify the numeric value of the frequency in format of little-endian. This means that the most significant bit should be a part of the DLC number 2 and the less significant bit should be a part of the DLC number 1. The fourth DLC specify the units of the value given in the second and third DLCs. This value can be obtained looking at figure \ref{fig:sensormodes}.
+There are three ways or modes in which a command can ask for data from a sensor. The first one is the mode one which asks for a sensor's data with a specific frequency. The first DLC of the CAN frame has to be set to '1' to activate the publisher mode. The second and third DLCs specify the numeric value of the frequency in format of little-endian. This means that the most significant bit should be a part of the DLC number 2 and the less significant bit should be a part of the DLC number 1. The fourth DLC specifies the units of time from the value given in the second and third DLCs. This value can be obtained looking at figure \ref{fig:sensormodes}.
 
-\begin{figure}[ht]
+\clearpage
+An example for starting publisher of the magnetometer sensor values, with normal priority, the CAN id should be composed by:
+
+\begin{itemize}
+	\item C\_S bit set to '0' on binary
+	\item Priority set to '10' on binary
+	\item Topic id of the magnetometer 'x' axis '0x05' on hexadecimal
+\end{itemize}
+
+\begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth]{modes}
     \caption{Pre-established CAN modes for transmitting sensor data \cite{DAEbot_Wiki}}
     \label{fig:sensormodes}
 \end{figure}
 
-For example for starting publisher of the magnetometer 'x' axis, with normal priority, the CAN id should be composed by:
-
-\begin{itemize}
-	\item C\_S bit set to '0' on binary
-	\item Priority set to '10' on binary
-	\item Topic id of the gyroscope 'x' axis '0x05' on hexadecimal
-\end{itemize}
-
-So a value equal of '01000000101' in binary or '0x205' in hexadecimal. Now lets say we want the magnetometer 'x' axis value every $900\mu s$. The value '900' in decimal is '0x0384' in hexadecimal, making the little-endian adjustment for the bytes will result in '8403'. $\mu s$ is equal to '0x02'.
+So a value equal of '01000000101' in binary or '0x205' in hexadecimal has to be sent as the topic id of the CAN frame. Now lets say we want this value every $900\mu s$. The value '900' in decimal is '0x0384' in hexadecimal, making the little-endian adjustment for the bytes will result in '8403', and the units of $\mu s$ are equivalent to '0x02' according to figure \ref{fig:sensormodes}.
 
 As a result, the complete CAN frame is: '0x205' for the id, '4' for the DLC or Data Length Code, each with the following values:
 
+\clearpage
 \begin{itemize}
 	\item DLC 0: 0x01
 	\item DLC 1: 0x84
@@ -595,14 +596,14 @@ As a result, the complete CAN frame is: '0x205' for the id, '4' for the DLC or D
 	\item DLC 3: 0x02
 \end{itemize}
 
-This command would trigger the DiWheelDrive to output the magnetometer 'x' axis value every $900\mu s$, with an id that is almost the same but with the C\_S bit set to '1' instead, so that the CAN bus knows that this frame belongs to a sensor data. The topic id then will be '0x605' instead of '0x205'. The way of reading and understanding the outputted value for each sensor will be mentioned in the following subsections.
+This command would trigger the DiWheelDrive to output the magnetometer axes values every $900\mu s$, with an id that is almost the same except for the command sensor bit that will be set to '1' instead, so that all the devices listening to the CAN bus know that this specific frame belongs to a sensor data. The topic id then will be '0x605' instead of '0x205'. The way of reading and understanding the outputted value for each sensor will be mentioned in the following subsections.
 
-The second mode is the \textit{One-time data transmission} and it will only return the required sensor value one time. For the example of a one time transmission of the floor proximity sensors, the id of the CAN frame should be '0x204' with DLC 0: 2.
+The second mode is the \textit{One-time data transmission} and it will only return the required sensor value one time. For the example of a one time transmission of the floor proximity sensors, the id of the CAN frame should be '0x204' with the DLC 0 set to '2'.
 
-The third mode is the mode '0' which actually stops an on-going publishing of a sensor value given the frame's id. This means that in the example used for the explanation of mode '1' the way of stopping the transmission of the magnetometer 'x' axis, the id of the CAN frame should be the same '0x205', with DLC 0: 0.
+The third mode is the mode '0' which actually stops an on-going publishing of a sensor value given the frame's id. This means that in the example used for the explanation of mode '1', the way for stopping that transmission of the magnetometer axes values would need the same id of the CAN frame i.e. '0x205', but with the DLC 0 set to '0'.
 
 \subsubsection{Gyroscope}
-The three axis of the gyroscope come together in one CAN frame with a DLC of six. Each value has a size of 16bits with a format  of little-endian. Every value comes in two's complement and the units are degrees per second, and the resolution is $+/-500 dps$. See table \ref{tab:gyroscope}.
+The three axes of the gyroscope come together in one CAN frame with a DLC of '6'. Each value has a size of 16bits with a format  of little-endian. Every value comes in two's complement with the units as degrees per second, and with a resolution of $+/-500 dps$. See table \ref{tab:gyroscope}.
 
 \begin{table}[h!]
 \centering
@@ -620,7 +621,7 @@ The three axis of the gyroscope come together in one CAN frame with a DLC of six
 \end{table}
 
 \subsubsection{Accelerometer}
-The three axis of the accelerometer come together in one CAN frame with a DLC of six as the gyroscope. Each value has a size of 16bits with a format of little-endian. Every value comes in two's complement and the units are $mili g$, and the result is scaled $+/-8g$. See table \ref{tab:accelerometer}.
+The three axes of the accelerometer come together in one CAN frame with a DLC of six as the gyroscope. Each value has a size of 16bits with a format of little-endian. Every value comes in two's complement and the units are $mili g$. The result is scaled by a factor of $+/-8g$. See table \ref{tab:accelerometer}.
 
 \begin{table}[h!]
 \centering
@@ -638,7 +639,7 @@ The three axis of the accelerometer come together in one CAN frame with a DLC of
 \end{table}
 
 \subsubsection{Magnetometer}
-In the case of the Magnetometer, every axis has an independent id, this is because the size of the data is 32bits in little-endian format. Every value comes in two's complement and the units are $\mu Gauss$, and the result is scaled by $+/-5Ga$. See table \ref{tab:magnetometer}.
+In the case of the Magnetometer, every axis has an independent id, this is because the size of the data is 32bits and the three values do not fit in one CAN frame. The value is also in little-endian format. Every value comes in two's complement with $\mu Gauss$ units, and the result is scaled by a factor of $+/-5Ga$. See table \ref{tab:magnetometer}.
 
 \begin{table}[h!]
 \centering
@@ -656,7 +657,7 @@ In the case of the Magnetometer, every axis has an independent id, this is becau
 \end{table}
 
 \subsubsection{Floor proximity sensors}
-The four proximity sensors on the bottom of the AMiRo are together in one CAN frame with a DLC of eight. Each value has a size of 16bits with a format of little-endian. The data is in luminance with units candelas per squared meter $cd/m^2$. See table \ref{tab:floorprox} and note that this sensor does not return a two's complement value.
+The four proximity sensors on the bottom of the AMiRo are together in one CAN frame with a DLC of '8'. Each value has a size of 16bits with a format of little-endian. The data is in luminance with units candelas per squared meter $cd/m^2$. See table \ref{tab:floorprox} and note that this sensor does not return a two's complement value.
 
 \begin{table}[h!]
 \centering
@@ -674,7 +675,7 @@ The four proximity sensors on the bottom of the AMiRo are together in one CAN fr
 \end{table}
 
 \subsubsection{Encoder}
-This sensor returns both the actual velocity and the odometry of the AMiRo. The first value will be the actual velocity followed by the odometry. For the odometry, the 'x' coordinate in $\mu m$ with a size of 32bits, the 'y' coordinate in $\mu m$ with a size of 32bits with a format of little-endian, and the orientation of the wheels in $\mu rad$ with a size of 16bits. All of these values are together in one CAN frame. See table \ref{tab:encoder}.
+This sensor command returns both the actual velocity and the odometry of the AMiRo. The first value will be the actual velocity followed by the odometry. For the odometry, the 'x' coordinate in $\mu m$ with a size of 32bits, the 'y' coordinate in $\mu m$ with a size of 32bits with a format of little-endian, and the orientation of the wheels in $\mu rad$ with a size of 16bits. All of these values are together in one CAN frame. See table \ref{tab:encoder}.
 
 \begin{table}[h!]
 \centering
@@ -691,7 +692,7 @@ This sensor returns both the actual velocity and the odometry of the AMiRo. The 
 \end{table}
 
 \subsubsection{Actual velocity}
-The actual velocity will be composed of the 'x' velocity in $\mu m/s$ with a size of 32bits and the 'z' angular velocity in $\mu rad/s$ also in 32bits with a format of little-endian. These two values are together in one CAN frame. See table \ref{tab:velocity}.
+The actual velocity will be composed of the 'x' velocity in $\mu m/s$ with a size of 32bits and the 'z' angular velocity in $\mu rad/s$ also in 32bits with a format of little-endian. These two values are together in one CAN frame. For getting this value, the user has to ask for the odometry topic. See table \ref{tab:velocity}.
 
 \begin{table}[h!]
 \centering
@@ -707,7 +708,7 @@ The actual velocity will be composed of the 'x' velocity in $\mu m/s$ with a siz
 \end{table}
 
 \subsubsection{Power Status}
-When the id for the power status is asked, four values are sent within one CAN frame. The charging or no charging flag in 8bits, the state of charge in percentage in 8bits, the minutes remaining for a complete charge when the flag for charging is 'on' and the minutes remaining of battery power when the flag for charging is 'off' in 16bits and in little-endian, and the current power consumption in $mW$ also in 16 bits and in little-endian. See table \ref{tab:powerstatus}.
+When the id for the power status is asked, four values are sent within one CAN frame. The charging or no charging flag in 8bits, the state of charge in percentage in 8bits, the minutes remaining for a complete charge when the flag for charging is 'on' and the minutes remaining of battery power when the flag for charging is 'off' in 16bits, and the current power consumption in $mW$ also in 16 bits. Every value is in little-endian format. See table \ref{tab:powerstatus}.
 
 \begin{table}[h!]
 \centering
@@ -725,7 +726,7 @@ When the id for the power status is asked, four values are sent within one CAN f
 \end{table}
 
 \subsubsection{Proximity ring}
-The proximity ring will return eight CAN frames one for every sensor there is. Each value is of 16btis and it is in little-endian, and the units are $mm$. See table \ref{tab:proxring}.
+The proximity ring will return eight CAN frames, one for every sensor there is. Each value is of 16bits and it is in little-endian format, with $mm$ units. See table \ref{tab:proxring}.
 
 \begin{table}[h!]
 \centering
@@ -747,7 +748,7 @@ The proximity ring will return eight CAN frames one for every sensor there is. E
 \end{table}
 
 \subsection{Actuators}
-There are so far two implemented actuators: the motors and the LEDs. The way of interacting with the sensors will be now described but it is important to note that they will not send anything back to the CAN bus, as they will only 'act'.
+There are two implemented actuators: the motors and the LEDs. The way of interacting with the sensors will be now described but it is important to note that they will not send anything back to the CAN bus, as they will only 'act'.
 
 \subsubsection{Motors}
 The motors can be started with a desired speed in $\mu m/s$ or in an angular speed with $\mu rad/s$ units. See table \ref{tab:setvelocity}. For the id of the motor's actuator please refer to the ControllerAreaNetwork.h file found in \ref{fig:DAAMIROstr}.
@@ -765,12 +766,13 @@ The motors can be started with a desired speed in $\mu m/s$ or in an angular spe
 \caption{\label{tab:setvelocity} CAN frame format for setting the velocity of the motors}
 \end{table}
 
+\clearpage
 \subsubsection{LEDs}
 \label{sub:CANleds}
 In order to turn a LED on, the following data structure has to be followed:
 
 \begin{itemize}
-	\item id: Desired LED's id obtainable from the ControllerAreaNetwork.h found in \ref{fig:DAAMIROstr}.
+	\item id: Desired LED's id obtainable from the ControllerAreaNetwork.h found in figure \ref{fig:DAAMIROstr}.
 	\item DLC 0: Red value
 	\item DLC 1: Green value
 	\item DLC 2: Blue value
@@ -780,7 +782,7 @@ In order to turn a LED on, the following data structure has to be followed:
 \label{chap:sensorDH}
 The sensor data handler is the responsible for setting the publisher of sensor's data. The publisher can handle every sensor sending its value at once as they have each a dedicated task in a real-time context. This means that every sensor has its own task assigned to it and said task gets suspended or resumed with the requested frequency according to the commands of the CAN frames.
 
-In figure \ref{fig:sensorclass} the structure of the sensor data handler can be seen as well as its connection with the sensor tasks. All of these tasks get managed by the sensor data instance.
+In figure \ref{fig:sensorclass} the structure of the sensor data handler can be seen as well as its relation with the sensor tasks.
 
 \begin{figure}[ht]
 	\includegraphics[width=15cm]{sensorclass}% 20cm, height = 10cm, angle = 90]{sensorclass}
@@ -789,18 +791,18 @@ In figure \ref{fig:sensorclass} the structure of the sensor data handler can be 
 \end{figure}
 
 \section{Overall functionality}
-The sensor handler is a class which has only once instance and its started in the main class, along with the tasks for all the sensors inside each board. When the task for the sensor handler is started, it polls the CAN reception for a CAN frame that has the C\_S bit set to a '0' which corresponds to a \textit{Command data}, according to fig \ref{fig:can} of section \ref{sec:canconv}.
+The sensor handler is a class which has only once instance and its started in the \textit{main.cpp} class, along with the tasks for all the sensors inside each board. When the task for the sensor handler is started, it polls the CAN reception for a CAN frame that has the C\_S bit set to a '0' which corresponds to a \textit{Command data}, according to fig \ref{fig:can} of section \ref{sec:canconv}.
 
 Whenever the sensor handler detects a CAN frame corresponding to a \textit{Command data}, the CAN frame has to be further analyzed to know if it is trying to communicate with a \textit{sensor} or with an \textit{actuator}. An example of this functionality can be seen in figure \ref{fig:seqoverall} which will be explained in section \ref{sub:rtimp}.
 
 \subsection{Sensor data handling}
-Whenever the command corresponds to a sensor, the next step is to read the DLC 0 to know if it is a command for stopping a sensor data, if it is a command for starting a publishing sensor data, or if it is a request for a one time transmission, see figure \ref{fig:sensormodes} from section \ref{sub:sensors}.
+Whenever the command corresponds to a sensor inside one of the boards, the next step is to read the DLC 0 to know if it is a command for stopping a sensor data, if it is a command to start a publishing sensor data, or if it is a request for a one time transmission, see figure \ref{fig:sensormodes} from section \ref{sub:sensors}.
 
 The state machine of figure \ref{fig:states} shows how the modes get handled. Whenever the DLC 0 has a '0' corresponding to a \textit{No transmission} is detected, the id from the topic gets identified and the corresponding task gets suspended so it no longer transmits its value.
 
-When the DLC 0 has a '1' corresponding to a \textit{Publisher} is detected, the DLC 1, DLC 2, and DLC 3 get decoded to know the requested frequency from the id of the sensor that needs to start sending its information. If the sensor was already sending information, it needs to update its frequency and the priority, and it gets going.
+When the DLC 0 has a '1' corresponding to a \textit{Publisher} is detected, the DLC 1, DLC 2, and DLC 3 get decoded to know the requested frequency from the id of the sensor that needs to start sending its information, see section \ref{sub:sensors}. If the sensor was already sending information, it needs to update its frequency and the priority, and it gets going.
 
-Finally, when the DLC 0 has a '2' which means that the user wants a \textit{One time transmission} of a sensor data, this value gets sent one time only. If this sensor was sending its value in a publisher, then the task gets suspended.
+Finally, when the DLC 0 has a '2' which means that the user wants a \textit{One time transmission} of a sensor data, this value gets sent one time only. If this sensor was sending its value in a publisher, then the task gets suspended after sending the value one time after the reception of the \textit{One time transmission} command.
 
 \begin{figure}[ht]
  \centering
@@ -810,19 +812,19 @@ Finally, when the DLC 0 has a '2' which means that the user wants a \textit{One 
 \end{figure}
 
 \subsection{Actuator data handling}
-In the other case, when the command is trying to communicate with an actuator, it goes into a sorter that separates the motor's command from the LEDs' command. If it is a command for the motors, then the motors get set with the velocity requested in the CAN frame. When its a LEDs command, the selected LED gets turn on or changes its color with the \textit{RGB} code reviewed in section \ref{sub:CANleds}.
+In the other case, when the command is trying to communicate with an actuator, the code goes into a sorter that separates the motor's command from the LEDs' command. If it is a command for the motors, then the motors get set with the velocity requested in the CAN frame. When it is a LEDs command, the selected LED gets turn on or changes its color with the \textit{RGB} code reviewed in section \ref{sub:CANleds}.
 
 \subsection{Real-time implementation}
 \label{sub:rtimp}
-The tasks corresponding to the sensors can all be operating at once. The priority of the tasks is being handled as preemptive tasks. This means that if two tasks are racing for the processing time, the one with higher priority will be preempted. Also, if one task is asked to output its value at the same frequency as a task that is already outputting its value, the one with higher priority will be on schedule and the one with less priority can be delayed some $\mu s$.
+The tasks corresponding to the sensors can all be operating at once. The priority of the tasks is being handled as preemptive tasks. This means that if two tasks are racing for the processing time, the one with higher priority can and will be preempted. Also, if one task is asked to output its value at the same frequency as a task that is already outputting its value, the one with higher priority will be on schedule and the one with less priority will be delayed the same amount of time it gets to the CAN module to transmit a frame.
 
-Everything up to this point works as an independent sensor data handler. This means that the internal controller is encapsulated and complete. The only thing that can interact with the functioning system are commands in the CAN bus. For this purpose the MuRox board has to be set and running the Linux based Operating System. See next chapter for more information about how to debug and the functionality of the \textit{Reflective Operator} in general.
+Everything up to this point works as an independent sensor data handler. This means that the internal controller is encapsulated and complete. The only thing that can interact with the functioning system are commands in the CAN bus. For this purpose the MuRox board has to be set and running the Linux based Operating System. See next chapter for more information the functionality of the \textit{Reflective Operator} in general.
 
-An example of how the controller and the \textit{Reflective Operator} are communicating can be seen in figure \ref{fig:seqoverall}. The three boards are constantly checking the CAN bus for a CAN id corresponding to a \textit{command}. Whenever the \textit{Reflective Operator} sends a command asking for the gyroscope value with a specific frequency, this CAN frame gets fetched by the \textit{DiWheelDrive} board and starts the thread of the gyroscope with the requested frequency and priority.
+An example of how the \textit{Controller} and the \textit{Reflective Operator} are communicating with each other can be seen in figure \ref{fig:seqoverall}. The three boards are constantly checking the CAN bus for a CAN id corresponding to a \textit{command}. In the example shown in figure \ref{fig:seqoverall}, whenever the \textit{Reflective Operator} sends a command asking for the gyroscope value with a specific frequency, this CAN frame gets fetched by the \textit{DiWheelDrive} board and starts the thread of the gyroscope with the requested frequency and priority.
 
-In the image the \textit{Reflective Operator} asks then for a proximity ring value. This sensor is located on the \textit{Power Management} board so this thread gets started by this board. Afterwards, the \textit{Reflective Operator} asks to set the motor with a specific speed. The \textit{DiWheelDrive} board where the motors are connected, fetches this information and sets the motors accordingly.
+Afterwards, the \textit{Reflective Operator} asks then for a proximity ring value. This sensor is located on the \textit{Power Management} board so this thread gets started by its corresponding board. Then, the \textit{Reflective Operator} asks to set the motor with a specific speed. The \textit{DiWheelDrive} board where the motors are connected, fetches this information and sets the motors accordingly.
 
-The same process gets carried out for the odometry value request, which is managed also by the \textit{DiWheelDrive} board. The \textit{Reflective Operator} asks to stop the gyroscope sensor from sending its value. This command also gets fetched by the same board and puts the corresponding thread to sleep.
+The same process gets carried out for the odometry value request, which is managed also by the \textit{DiWheelDrive} board. In the example, the \textit{Reflective Operator} asks to stop the gyroscope sensor from sending its value. This command also gets fetched by the same board and puts the corresponding thread to sleep.
 
 Finally the \textit{Reflective Operator} asks for the LED number 3 to turn on with a specific RGB value. This information is fetched by the \textit{Light Ring} board and turns on the LED with the requested information.
 
@@ -835,17 +837,17 @@ Finally the \textit{Reflective Operator} asks for the LED number 3 to turn on wi
 
 \chapter{Reflective Operator}
 \label{chap:reflective}
-The board responsible of performing as the \textit{Reflective Operator} of the system is the MuRoX board. This board is the one that asks for a certain sensor data from the internal controller or also it can control the actuators. The user can connect to this board through ssh, with the address 192.168.1.1 with password \textit{root}.
+The board responsible of performing as the \textit{Reflective Operator} of the system is the MuRoX board. This board is the one that can ask for a certain sensor data from the internal controller or ask an actuator to set a determined value. The user can connect to this board through ssh, with the address 192.168.1.1 with password \textit{root}.
 
 The board already has a package called 'candump' which interacts with the CAN module in the board and can be used to debug the internal controller's functionality. The way of sending CAN frames from the MuRoX board has to follow the next convention:
 
 \begin{lstlisting}[caption = CAN send format, label = CAN:debug, captionpos = b]
-cansend can0 --identifier=CANid DLC0 DLC1 DLC2 DLC3 DLC4 ...
+cansend can0 --identifier=CANid DLC0 DLC1 DLC2 DLC3...
 \end{lstlisting}
 
 \section{Compiling for MuRoX}
 \label{sec:poky}
-For creating an application that the \textit{Reflective Operator} can run, it is necessary to use the \textit{cortexa8hf-vfp-neon-poky-linux-gnueabi} version of the cross-compiler. Once the application is compiled, the resulting binaries can be moved into the board using the \textit{scp} command.
+For creating an application that the \textit{Reflective Operator} can run, it is necessary to use the \textit{cortexa8hf-vfp-neon-poky-linux-gnueabi} version of the cross-compiler. Once the application is compiled, the resulting binaries can be moved into the board using the \textit{scp} command. The user can use one of the demos or the simple C application from figure \ref{fig:DAAMIROstr} as a template.
 
 \begin{lstlisting}[caption = moving files into MuRoX board \cite{AMiRo_Murox}, label = CAN:debug, captionpos = b]
 scp anyFile root@192.168.0.1:~
@@ -853,13 +855,13 @@ scp anyFile root@192.168.0.1:~
 
 \section{Compiling from a Simulink model for MuRoX}
 \label{sec:matlab}
-Alternatively, an application for the \textit{Reflective Operator} can be also compiled form a Simulink model. For this purpose, the user can modify the Simulink model that is already a part of the project, inside the \textit{Reflective\_Operator/Matlab\_Reflective\_Operator} from figure \ref{fig:DAAMIROstr}. Once the model has been edited, the user has to generate the code using the Matlab solver with the current settings.
+Alternatively, an application for the \textit{Reflective Operator} can be also compiled form a Simulink model. For this purpose, the user can modify the Simulink model that is already a part of the project inside the \textit{Reflective\_Operator/Matlab\_Reflective\_Operator} path from figure \ref{fig:DAAMIROstr}. Once the model has been edited, the user has to generate the code using the Matlab solver with the current settings.
 
 After the code has been successfully generated, the user must go into the \textit{Reflective\_Operator/Demo\_Applications/Demo\_Matlab\_Reflective\_Operator} directory where a bash file with the name of \textit{matlab\_amiro\_setup.sh} is. When executed, this shell script copies the necessary files into the current folder, copies a custom makefile that was created to cross-compile with the requirements for the MuRoX board, and compiles the application. The generated binary can be copied into the MuRoX board with the method described in section \ref{sec:poky}.
 
 \section{Example applications}
 \label{sect:example}
-For testing purposes, four demo applications were created. These applications are already inside the \textit{Reflective Operator}, but the user can modify and recompile the source code which is obtainable from the DA\_AMiRo git repository \cite{AMiRo_Git}. The modified versions of the source code can be compiled and uploaded to the MuRoX board using the method already described in section \ref{sec:poky}. The three demos are:
+For testing purposes, four demo applications were created. These applications are already inside the \textit{Reflective Operator}, but the user can modify, recompile, and replace the source code which is obtainable from the DA\_AMiRo git repository \cite{AMiRo_Git}. The modified versions of the source code can be compiled and uploaded to the MuRoX board using the method already described in section \ref{sec:poky}. The four demos are:
 
 \begin{itemize}
   \item \textit{Demo Sender Reflective Operator}
@@ -868,7 +870,7 @@ For testing purposes, four demo applications were created. These applications ar
 	\item \textit{Demo Matlab Reflective Operator}
 \end{itemize}
 
-The first one is called \textit{Demo Sender Reflective Operator} and it is a simple application where the user can send commands to the internal controller with assistance of a set of menus. The application asks for the priority, the topic id, the mode to be set, and all the needed fields for each case. It also separates actuators from sensors. This application facilitates the sending of commands, because the user does not have to memorize the topic ids or the CAN frame conventions.
+The first one is called \textit{Demo Sender Reflective Operator} and it is a simple application where the user can send commands to the internal controller with assistance of a set of menus and sub menus. The application asks for the priority, the topic id, the mode to be set, and all the needed fields for each case. It also separates actuators from sensors. This application facilitates the sending of commands, because the user does not have to know the topic ids or the CAN frame conventions.
 
 In figures \ref{fig:sender1} and \ref{fig:sender2} a possible usage of the demo is shown. The menus can be seen, as the first one asks if the user wants to talk with an actuator or a sensor. If the answer is an actuator, like in figure \ref{fig:sender1} the second menu is to select which actuator to use and finally to set the according values to the desired actuator. If the user wants to talk with a sensor like in figure \ref{fig:sender2}, the menus ask for the mode: stop, publisher, and one time transmission. Then it proceeds to ask the frequency if it was publisher, the topic and the priority.
 
@@ -897,7 +899,7 @@ The second application is called \textit{Demo Receiver Reflective Operator} and 
 
 The idea behind these two applications \textit{Demo Sender Reflective Operator} and \textit{Demo Receiver Reflective Operator} is that the user runs both at the same time in two different terminal windows to send commands and to see how they are being answered in real time.
 
-The third application is called \textit{Demo Standalone Reflective Operator}. It has a determined functionality so the user needs only to run it in order to see its results with the help of the \textit{Demo Receiver Reflective Operator} or the \textit{candump} package. This Demo has a set of commands to be sent to the internal controller and shows the outputs of the sensors. The demo has the following expected functionality which can be seen in figures \ref{fig:timing1} and \ref{fig:timing2}.
+The third application is called \textit{Demo Standalone Reflective Operator}. This demo has a determined functionality so the user needs only to run it in order to see its results with the help of the \textit{Demo Receiver Reflective Operator} or the \textit{candump} package. This Demo has a set of commands to be sent to the \textit{Internal Controller} and shows the outputs of the sensors. The demo has the following expected functionality which can be seen in figures \ref{fig:timing1} and \ref{fig:timing2}.
 
 \begin{enumerate}
 \item At 1s the CAN bus has a command frame asking for the accelerometer values every 500ms.
@@ -933,9 +935,9 @@ The third application is called \textit{Demo Standalone Reflective Operator}. It
   	\label{fig:timing2}
 \end{figure}
 
-The fourth demo is the \textit{Demo Matlab Reflective Operator} and it is the resulting application from the Simulink model. The current demo turns on three LEDs on the AMiRo but the user can modify the Simulink model to fulfill any desired functionality. The way of compiling a modified version of the Simulink model was discussed in section \ref{sec:matlab}.
+The fourth and final demo is the \textit{Demo Matlab Reflective Operator} and it is the result of the Simulink model compilation. The current demo turns on three LEDs on the AMiRo but the user can modify the Simulink model to fulfill any desired functionality. The way of compiling a modified version of the Simulink model was discussed in section \ref{sec:matlab}.
 
-Lastly, the user can also send independent CAN frames using the \textit{candump} package installed in the MuRoX board, as it was already discussed in chapter \ref{chap:reflective}. For this method, the user has to decode previously the topic id and the CAN data frames according to images \ref{fig:can} and \ref{fig:sensormodes}.
+Lastly, the user can also send independent CAN frames using the \textit{candump} package installed in the MuRoX board, as it was already discussed in chapter \ref{chap:reflective}. For this method, the user has to code previously the topic id and the CAN data frames according to images \ref{fig:can} and \ref{fig:sensormodes}.
 
 \chapter{Results}
 \section{DA\_AMiRo performance}
@@ -973,7 +975,7 @@ In figure \ref{fig:ressend} the process described in figures \ref{fig:timing1} a
 
 Now lets have a look at the results. In figure \ref{fig:res1} the values of the accelerometer and the proximity ring sensors are displayed. In figure \ref{fig:res2} values for the magnetometer, gyroscope, velocity, and encoders are displayed. The velocity and encoder CAN frames show that the motors were on-going at the moment of the CAN frame being sent. And finally in figure \ref{fig:res3} the power status gets shown, the magnetometer values appear as well, and also the proximity floor sensors are displayed.
 
-The functionality and frequency of the expected values is very satisfactory, because the delays between every value from the same sensor are exactly as the requested in the \textit{Demo Standalone Reflective Operator} seen in figure \ref{fig:ressend}. And even though as seen on top of figure \ref{fig:res2}, the CAN frames for the magnetometer values are not sent in a row but the value of the velocity gets sent before the magnetometer 'y' value. This behavior is expected as it adheres to the requested frequencies. In the case from the velocities requested frequency, the $900ms$ between two velocity CAN frames is precise.
+The functionality and frequency of the expected values is very satisfactory, because the delays between every value from the same sensor are exactly as the requested in the \textit{Demo Standalone Reflective Operator} seen in figure \ref{fig:ressend}. And even though as seen on top of figure \ref{fig:res2}, the CAN frames for the magnetometer values are not sent in a row because the value of the velocity gets sent before the magnetometer 'y' value. This behavior is expected as it adheres to the requested frequencies. In the case from the velocities requested frequency, the $900ms$ between two velocity CAN frames is precise.
 
 As it can be seen, the delay between two CAN frames of the same sensor, correspond to the frequencies requested from the \textit{Demo Standalone Reflective Operator} as seen in figure \ref{fig:ressend}. There is however, an expected delay between the sensors that get sent together in different CAN frames. Such is the case of the magnetometer values, that are sent in three different CAN frames and the proximity floor ring sensors that are sent in eight different CAN frames as explained in section \ref{sub:sensors}. This delay is of $20ms$ and affects only the frequencies of said  sensor values. So for example if the magnetometer value gets requested at a period of time shorter than every $20ms$, then the CAN frames will not be sent appropriately. This delay does not affect other possible parallel tasks.
 
@@ -985,20 +987,21 @@ In this section the structure and functionality of the AMiRo OS and the OCM appr
 
 The AMiRo OS is a very complete system that has a lot of possible applications for different purposes, from line followers, to a LIDAR that can detect obstacles. It also has a command line shell in which the user can communicate with the AMiRo in very simple commands. This feature is very helpful to get an immediate status of a sensor or to get a quick response from the AMiRo.
 
-Every board has a user thread where a functionality using the sensors of the board is implemented. Everyone of these boards gets to broadcast its sensor values via CAN with a pre-selected frequency. A good way the user can interact with the sensors and the boards themselves, is via the \textit{Cognition Board} that also has pre-compiled demos in the Wiki \cite{AMiRo_Murox} for different possible applications.
+Every board has a user thread where a functionality using the sensors of the board is implemented. Each of these boards gets to broadcast its sensor values via CAN with a pre-selected frequency. A good way the user can interact with the sensors and the boards themselves, is via the \textit{Cognition Board} that also has pre-compiled demos in the Wiki \cite{AMiRo_Murox} for different possible applications.
 
 The AMiRo OS has all of the possible functionalities already implemented and this takes a lot of the processing power from the boards, this is one of the main differences between this and the DA\_AMiRo project. The latter has a specific purpose and the processing power is focused towards this goal, making it more resource effective. A good example of this is that the DA\_AMiRo does not have possible demos implemented like the line follower, the motor corrections, and the obstacle avoidance for mentioning a few.
 
-What appears to be similar between these two projects is the CAN broadcasting of the AMiRo OS and the CAN sensor handler of the DA\_AMiRo project. The AMiRo OS sends the values of the sensors all together via the CAN bus at a specific frequency of $16Hz$, while the DA\_AMiRo project has a much more complex sensor value handling as it has been already explained through the past chapters.
+What appears to be similar between these two projects is the CAN broadcasting of the AMiRo OS and the CAN sensor handler of the DA\_AMiRo project. The AMiRo OS sends the values of the sensors all together via the CAN bus at a specific frequency of $16Hz$, while the DA\_AMiRo project focuses on a much more complex sensor value handling as it has been already explained through the past chapters.
 
 One of the biggest advantages of the DA\_AMiRo project is the compatibility of the Simulink models from Matlab to generate applications for the Reflective Operator of the AMiRo. The students can easily edit the given model to operate according a desired goal. This method is easy because with the Simulink model the students can change logic in a visual fashion rather than a code one. Instead of having to remember the CAN frame conventions or worrying about a programming language issue, they can simply change the values of the model or create logic with simple block logic in Simulink.
 
+\clearpage
 \section{Outlook}
 The real-time functionality in the DA\_AMiRo project is works as expected: it fulfills the performance deadlines and does not loose packages. After performing a stress test on the system, the error range or delays found are still small enough to make the project fulfill the requirements of a soft real-time system.
 
 The system is also capable of handling all the available tasks from the sensors at once, and communicates successfully with the actuators, changing its values at the will of the user. On top of this, the DA\_AMiRo project is fulfilling the CAN frame conventions established by Uwe Jahn.
 
-With the help of the Simulink models, the usage of the Reflective Operator becomes very simple. This feature makes the DA\_AMiRo project a good tool for students to work with real-time systems and learn from them in a simple and visual way.
+With the help of the Simulink models, the usage of the Reflective Operator becomes very simple, giving the opportunity to a possible scholar application. This feature makes the DA\_AMiRo project a good tool for students to work with real-time systems and learn from them in a simple and visual way.
 
 %bibliography
 \printbibliography
