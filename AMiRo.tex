@@ -107,6 +107,7 @@ The third layer is the Cognitive Operator. On this layer the system gathers info
 
 This project compares the AMiRo OS with the OCM based architecture of the DA\_AMiRo. The controller is the responsible for commanding the internal sensors of the STM32F32 boards inside DA\_AMiRo in real-time. This sensor information is then retrieved by the Reflective operator board with a few demo applications that will be explained later in this document inside section \ref{sect:example}.
 
+%\clearpage
 \section{AMiRo}
 The AMiRO project, which stand for Autonomous Mini Robot was started in the University of Bielefeld\footnote{See: https://www.uni-bielefeld.de/} by Stefan Herbrechtsmeier and developed by Thomas Schöpping in collaboration with few others. The motivation for this project was to use small embedded systems in order to create a small robot that is easy to transport, usable on a table or the floor, appealing for young people, that is created with a modular approach is able to be extendable and customizable. With all of these aspects in mind, the result should be also a powerful tool for research and education \cite{AMiRo_ppt_v1}.
 
@@ -131,7 +132,7 @@ In the left picture of figure \ref{fig:real_1} the AMiRo can be seen with the th
     \caption{AMiRo with and without chassis \cite{AMiRo_paper_modular}.}
     \label{fig:real_1}
 \end{figure}
-\clearpage
+%\clearpage
 
 \section{Hardware Architecture of AMiRo}
 As mentioned in the previous chapter, the AMiRo is equipped with three basic board modules and two extension boards. In this section each board will be briefly discussed with a special emphasis in the functionalities that are of interest for this thesis. For a more complete discussion about the boards or the AMiRo in general, the reader is invited to read the documentation referenced in this work, specially \cite{AMiRo_paper_verstaile, AMiRo_paper_modular, AMiRo_paper_applications, AMiRo_ppt_v1, AMiRo_ppt_v2} whic\ can be found on the CITEC website or on the repository of this work on gitlab \cite{AMiRo_Git}.
@@ -146,7 +147,7 @@ In figure \ref{fig:schemat} a schematic of the AMiRo can be seen, with the three
     \caption{Inner parts of AMiRo with all extension boards, and overview of the electrical interfaces \cite{AMiRo_paper_modular}.}
     \label{fig:schemat}
 \end{figure}
-\clearpage
+%\clearpage
 
 \subsection{DiWheelDrive}
 \label{sub:DWD}
@@ -164,7 +165,7 @@ The \textit{DiWheelDrive} board ready to be mounted into the robot can be seen i
     \caption{Top and bottom view respectively of the DiWheelDrive board \cite{AMiRo_ppt_v1}.}
     \label{fig:diwheel}
 \end{figure}
-\clearpage
+%\clearpage
 
 \subsubsection{Gyroscope}
 The gyroscope is a sensor that measures rotational motion. The units of the resulting measurement are revolutions per second or degrees per second. As a quick example, in a balancing robot a gyroscope can be used to measure how much the robot has rotated from the desired position and this information can be sent to an actuator to make corrections in order to reach the desired angle \cite{gyrostheory}. A gyroscope normally consists of a mass that moves with constant angular momentum, so when the gyroscope is tilted the axis of rotation of said mass reacts to the applied rotational movements making the axis of rotation tilt. This tilting leads to a displacement of the capacitance fingers inside the sensor which changes the capacitance. Finally when compared to a reference capacitance level, the angular velocity can be determined \cite{AMiRo_ppt_v1}.
@@ -215,7 +216,7 @@ The \textit{PowerManagement} board ready to be mounted into the robot can be see
     \caption{Top and bottom view respectively of the Power Management board \cite{AMiRo_ppt_v1}.}
     \label{fig:powerm}
 \end{figure}
-\clearpage
+%\clearpage
 
 \subsubsection{Power Status}
 For the tracking of the power status, AMiRo is equipped with a bq27500 Impedance Track from Texas Instruments that allows the robot to obtain information such as remaining battery capacity, state-of-charge, run-time to empty, battery voltage, and temperature \cite{impedancepart}.
@@ -231,7 +232,7 @@ The \textit{Proximity Ring} ready to be mounted into the robot can be seen in fi
     \caption{Proximity Ring view \cite{AMiRo_ppt_v1}.}
     \label{fig:proxring}
 \end{figure}
-\clearpage
+%\clearpage
 
 \subsection{Light Ring}
 The Light Ring board is the top-most board in the AMiRo. This board has a STMicroelectronics ARM Cortex-M3 based STM32F103 MCU. It contains eight RGB LEDs arranged in a circular way corresponding to the Proximity Ring discussed in last section. The LEDs can be set from the Cognition board, setting each color of the RGB channels \cite{AMiRo_paper_modular}.
@@ -244,7 +245,7 @@ The \textit{LightRing} board ready to be mounted into the robot can be seen in f
     \caption{Top and bottom view respectively of the Light Ring board \cite{AMiRo_ppt_v1}.}
     \label{fig:lightr}
 \end{figure}
-\clearpage
+%\clearpage
 
 \subsection{Cognition Board}
 \label{sub:cogn}
@@ -277,6 +278,7 @@ As said before, the DiWheelDrive is the only module of which the programming por
 \subsection{AMiRo real-time operating system kernel}
 The real-time operating system that is being used is the open-source ChibiOS. This project aims at creating a portable, light weight, and fast real-time operating system for embedded applications \cite{chibioshp}. ChibiOS not only provides low-level drivers for all interfaces of the most common microcontrollers, but it also gives an unified hardware abstraction layer, priority based preemptive scheduling, and high-performance event and message passing systems. ChibiOS can be configured statically and dynamically to exactly fit the application in order to maximize efficiency and performance \cite{AMiRo_paper_modular}.
 
+\clearpage
 \subsubsection{ChibiOS}
 Some of the main characteristics from ChibiOS are:
 
@@ -301,7 +303,7 @@ A project containing ChibiOS consists on the Operating System source files, few 
 
 \subsection{AMiRo Operating System structure}
 \label{AMiRo_OS}
-AMiRo's Operating System or board specific abstraction layer from the original repository \cite{AMiRo_Wiki} includes two basic applications, the first one is a rudimentary command shell and the second one a hardware test. The first one is already integrated in ChibiOS and it is extended by module specific commands \cite{AMiRo_paper_modular}.
+AMiRo's Operating System or the board specific abstraction layer from the original repository \cite{AMiRo_Wiki} includes two basic applications, the first one is a rudimentary command shell and the second one a hardware test. The first one is already integrated in ChibiOS and it is extended by module specific commands \cite{AMiRo_paper_modular}.
 
 The structure of the AMiRo Operating System, including the files that are being used with the current project can be visualized in figure \ref{fig:OS}. The entire project is written in C++ language, with some inclusions of C code. In this figure, it can be seen that inside \textit{AMiRo\_OS} there is the \textit{components} folder which contains the shared codes that the three boards are using. The other part of the structure worth mentioning now is the \textit{devices} folder in which the three boards have their own set of files, always maintaining the same structure among them.
 
@@ -364,7 +366,7 @@ From the shown functions in ControllerAreaNetworkRx.cpp it is clear that this cl
 Now that the functionality of the CANRx/Tx.cpp has been shown, each one of the three boards that inherit from them will be briefly discussed.
 
 \subsubsection{DiWheelDrive project}
-Lets look at \textit{main.cpp} from \textit{DiWheelDrive} board. The shell which was already mentioned is being managed by this board. Every sensor that will be used is waken up and the communications protocols for each one is started. It is also in this code where all the threads are being started. The threads are:
+Lets have a look at \textit{main.cpp} from \textit{DiWheelDrive} board. The shell which was already mentioned is being managed by this board. Every sensor that will be used is waken up and the communications protocols for each one is started. It is also in this code where all the ChibiOS threads are being started. The threads are:
 
 \begin{itemize}
   \item Power status
@@ -377,19 +379,19 @@ Lets look at \textit{main.cpp} from \textit{DiWheelDrive} board. The shell which
 	\item User thread
 \end{itemize}
 
-Each one of these threads is also a class which objects are created in the \textit{global.hpp} so that the encapsulated values of each object can be accessed from the outside. In global.h all the sensors corresponding to the \textit{DiWheelDrive} are initialized and configured for its use. As an example, the registers for using the magnetometer or \textit{hmc5883l} are configured to set the number of samples averaged, select the data output rate bits, set the measurement configuration bits, set the gain configuration bits, among other things. For more precise information about the registers and how to configure the sensors, please refer to the sensor's data sheet, in this case \cite{magnetometerpart}.
+Each one of these threads is inside a class with the same name. The instances of these classes are created in the \textit{global.hpp} so that the encapsulated values of each object can be accessed from the outside. In global.h all the sensors corresponding to the \textit{DiWheelDrive} project are initialized and configured for its use. As an example, the low level registers for using the magnetometer or \textit{hmc5883l} are configured to set the number of samples averaged, select the data output rate bits, set the measurement configuration bits, set the gain configuration bits, among other things. For more precise information about the registers and how to configure the sensors, please refer to the specific sensor's data sheet that are listed in the bibliography, in this case \cite{magnetometerpart}.
 
-Global is also a class and an instance of it is created in \textit{main.cpp} which is called \textit{robot}, meaning that from \textit{main.cpp} the user can access the elements of \textit{robot} among which are the instances of the sensors listed above. For example, in order to access the magnetometer, the user has to use something like this: \textit{robot.hmc5883l...}.
+The \textit{global.cpp} code is also a class and an instance of it is created in \textit{main.cpp} which is called \textit{robot}, meaning that from \textit{main.cpp} the user can access the elements of \textit{robot} among which are the instances of the sensors listed above. For example, in order to access the magnetometer, the user has to type something like this: \textit{robot.hmc5883l...}.
 
-Regarding the threads listed above, the Power status in this board only makes a self test and initiates a power monitor. The magnetometer, gyroscope, accelerometer, power status, odometry, and the proximity floor classes, have functions for updating their sensor's data, and functions for getting the actual sensor's value in a raw format and also with a specific unit. For the available units for every sensor, see section \ref{sub:sensors}.
+Regarding the threads listed above, the Power status in this board only makes a self test and initiates a power monitor. The magnetometer, gyroscope, accelerometer, power status, odometry, and the proximity floor classes, have functions for updating their sensor's data, but also functions for getting the actual sensor's value in a raw format or with a specific unit. For the available units for every sensor, see section \ref{sub:sensors}.
 
 The threads of the magnetometer, gyroscope, accelerometer, power status, odometry, and proximity floor sensors are constantly updating their values so that they are ready whenever they are required. As a side note, the magnetometer thread, the gyroscope thread, the accelerometer thread, and the proximity floor sensors thread are constantly broadcasting to the CAN bus at a given frequency which is set to $16Hz$.
 
-The motor control thread is constantly updating the increments of velocity, the speed, calculating velocities in desired units. In addition to this, the thread updates past velocities for the derivative part of a PID controller tje user has access to, and writes the calculated duty cycle of the PWM driver.
+The motor control thread is constantly updating the increments of velocity, the speed, calculating velocities in desired units. In addition to this, the thread updates past velocities for the derivative part of a PID controller the user has access to, and writes the calculated duty cycle of the PWM driver.
 
 Lastly, the user thread of the \textit{DiWheelDrive} is a complete line following application that makes AMiRo able to follow a black line on the ground that is over a white surface.
 
-The overall structure from the \textit{DiWheelDrive} project can be seen in figure \ref{fig:DWDclassOS} where the sensors are broadcasting their values at once to the CAN bus. Also, as discussed before, the ControllerAreaNetworkRx.cpp is constantly monitoring the CAN bus for commands that would like to calibrate or select a desired end value in the encoders and the motors, but also for controlling the motors themselves.
+The overall structure from the \textit{DiWheelDrive} project can be seen in figure \ref{fig:DWDclassOS}. Also, as discussed before, the ControllerAreaNetworkRx.cpp is constantly monitoring the CAN bus for commands that would like to calibrate or select a desired end value in the encoders and the motors, but also for controlling the motors themselves.
 
 \begin{figure}[ht]
 	\centering
@@ -405,13 +407,13 @@ The \textit{Power Management} project follows the same structure mentioned for t
   \item Power status
 	\item Proximity ring sensors
 	\item ADC
-	\item Touch sensors %mpr121 part of the ring sensors
+	\item Touch sensors
 	\item User thread
 \end{itemize}
 
 The proximity ring and the touch sensor threads are constantly updating its sensors' values. The touch sensor \textit{mpr121} is part of the proximity ring sensors structure and these two sensors are also broadcasting its values through the CAN bus like the ones from \textit{DiWheelDrive}.
 
-The power status thread receives help of the ADC thread which constantly monitoring the charge of the batteries and converting the analog levels of charge to a digital number. The power status thread then it is frequently updating values such as the current battery levels, the time of charge remaining, whether or not AMiRo is plugged in, and the current consumption.
+The power status thread receives help of the ADC thread which constantly monitoring the charge of the batteries and converting the analog levels of charge to a digital number. So the power status thread is frequently updating values such as the current battery levels, the time of charge remaining, whether or not AMiRo is plugged in, and the current consumption.
 
 The user thread of the \textit{Power Management} is an obstacle avoidance application for the AMiRo which also sends commands via CAN to the \textit{DiWheelDrive} in order to stop the AMiRo or stir it in order to stop it from crashing.
 
@@ -424,6 +426,7 @@ The overall structure from the \textit{PowerManagement} project can be seen in f
     \label{fig:PMclassOS}
 \end{figure}
 
+\clearpage
 \subsubsection{Light Ring project}
 Finally the \textit{Light Ring} project is the simplest of the three projects, it follows the same structure mentioned for the \textit{DiWheelDrive} and \textit{Power Management}, with a \textit{main.cpp} and its own \textit{global.hpp}. The instance of the global class is also called \textit{robot} and also can be accessed from the \textit{main.cpp}. The list of the threads of the \textit{Light Ring} is as follows:
 
@@ -433,11 +436,11 @@ Finally the \textit{Light Ring} project is the simplest of the three projects, i
 	\item User thread
 \end{itemize}
 
-The lidar thread is performing a configuration of the lidar and a quick check to see if it is communicating correctly with the system. Afterwards it is constantly updating its values.
+The lidar class performs a configuration of the lidar and a quick check to see if it is communicating correctly with the system. The lidar thread is constantly updating its values.
 
 The LEDs thread is constantly refreshing the LEDS with the preset brightness values and the colors assigned to each of them.
 
-The user thread of the \textit{Light Ring} has no implemented application and remains open for the user to assign one.
+The user thread of the \textit{Light Ring} has no implemented application and remains open for the user to create one.
 
 The overall structure from the \textit{LightRing} project can be seen in figure \ref{fig:LRclassOS} where the sensors are broadcasting their values at once to the CAN bus. Also, as discussed before, the ControllerAreaNetworkRx.cpp is constantly monitoring the CAN bus for commands that would like to set the LEDs to a certain color and to adjust the brightness.
 
@@ -450,10 +453,10 @@ The overall structure from the \textit{LightRing} project can be seen in figure 
 
 %\clearpage
 \chapter{DA\_AMiRo software architecture}
-From the past chapter the hardware and software structure of the AMiRo was mentioned and discussed. From this point forward the structure and functionality of the DA\_AMiRo project which is based on the OCM model will be discussed as it is the central point of the master thesis. As a friendly reminder, the reader can obtain the source codes made for the DA\_AMiRo project from the repository \cite{AMiRo_Git}.
+From the past chapter the hardware and software structure of the AMiRo was mentioned and discussed. From this point forward the structure and functionality of the DA\_AMiRo project which is based on the OCM model will be discussed as it is the central point of the master thesis. As a friendly reminder, the reader can obtain the source codes made for the DA\_AMiRo project from the repository\footnote{https://gitlab.idial.institute/DAdevs/DA\_AMiRo.git} \cite{AMiRo_Git}.
 
 \section{DA\_AMiRo software structure}
-In last chapter, the AMiRo's Operating System structure was introduced. This Operating System is the one located on top of figure \ref{fig:DAAMIROstr}, inside the folder called \textit{amiro\_1.0\_stable}. In order to fulfill the requirements of the DA\_AMiRo project, the AMiRo OS had to be changed for a OCM apporach, and the functionality of the resulting software structure will be discussed in section \ref{sub:DAAMIROOS}.
+In last chapter, the AMiRo's Operating System structure was introduced. This Operating System is the one located on top of figure \ref{fig:DAAMIROstr}, inside the folder called \textit{amiro\_1.0\_stable}. In order to fulfill the requirements of the DA\_AMiRo project, the AMiRo OS had to be replaced for a OCM apporach, and the functionality of the resulting software structure will be discussed in section \ref{sub:DAAMIROOS}.
 
 \begin{figure}[ht]
 	\centering
@@ -462,11 +465,11 @@ In last chapter, the AMiRo's Operating System structure was introduced. This Ope
     \label{fig:DAAMIROstr}
 \end{figure}
 
-The configuration files for the three projects are located inside the \textit{Devices} folder which can be visualized in figure \ref{fig:DAAMIROstr}. They configure the QT IDE for each of the three boards, so the user can easily code and create the binary to program the AMiRo's boards. It is also inside this folder where the \textit{Reflective Operator} is located. The Reflective Operator consists of three parts: a simple C application, a Matlab application for the MuRoX board where a Simulink model that can be programmed into the Reflective Operator is located, and four already compiled and functioning Demo Applications. These Demo Applications will be discussed in chapter \ref{chap:reflective}, but it is worth mentioning that they are already inside the MuRoX board, ready to be used.
+The configuration files for the three projects are located inside the \textit{Devices} folder which can be visualized in figure \ref{fig:DAAMIROstr}. They configure the QT IDE for each of the three boards, so the user can easily edit the code and build the binary files to program the AMiRo's boards. It is also inside this folder where the \textit{Reflective Operator} is located. The Reflective Operator consists of three parts: a simple C application template, a Matlab and a Simulink model that can be easily edited and programmed into the Reflective Operator, and four already compiled and functioning Demo Applications. The Demo Applications and the way of making custom applications from a Simulink model will be discussed in chapter \ref{chap:reflective}. It is worth mentioning that the demo applications are already inside the MuRoX board, and they are ready to be used.
 
-Inside the \textit{Peripheral-Drivers} the user can find the ControllerAreaNetwork.h responsible of having the structures and all the definitions that are being used by both the Internal Controller corresponding to the three basic boards and the \textit{Reflective Operator} which is being done by the MuRoX board. It is also inside this folder that the \textit{sensorhandler.cpp} and \textit{sensorhandler.h} are found. These both files manage the scheduling of the sensor data and they will be discussed in chapter \ref{chap:sensorDH}.
+Inside the \textit{Peripheral-Drivers} the user can find the ControllerAreaNetwork.h which is the responsible of defining the structures and all the definitions that are being used by both the Internal Controller corresponding to the three basic boards and the \textit{Reflective Operator}. It is also inside this folder that the \textit{sensorhandler.cpp} and \textit{sensorhandler.h} are to be found. These both files manage the scheduling of the sensor data and they will be discussed in chapter \ref{chap:sensorDH}.
 
-Finally, the folder \textit{Documentation} has some of the papers and information that the AMiRo has had since it was created. The reader can go inside this folder for getting more information about the AMiRo. In the other hand, the folder \textit{PusleAT} was created for a future usage and it is still a work in progress.
+Finally, the folder \textit{Documentation} has some of the scientific papers and information that the AMiRo has had since it was created. The reader can go inside this folder to get more information about the AMiRo. In the other hand, the folder \textit{PusleAT} was created for a future usage and it is still a work in progress.
 
 \section{DA\_AMiRo Operating System's functionality}
 \label{sub:DAAMIROOS}
