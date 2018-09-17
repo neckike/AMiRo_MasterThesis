@@ -34,6 +34,7 @@
 \begin{flushleft} \large
 \emph{Author:}\\
 Hector Gerardo Munoz Hernandez
+Matriculation No.: 7094264
 \end{flushleft}
 \end{minipage}
 ~
@@ -185,7 +186,7 @@ The last principle is called the \textit{Hall effect} discovered in 1897 by Edwi
 
 The magnetometer used in the DiWheelDrive board is the hmc5883l from STMicroelectronics. This sensor is configured to have a field resolution of $+/-5Gauss$ according to the user's manual \cite{magnetometerpart} and the current output is set to be in micro Gauss units. The sensor is being communicated via I2C protocol with the processor.
 
-\subsubsection{Floor Proximity Sensor}
+\subsubsection{Floor Proximity Sensors}
 \label{sec:AMS}
 The floor proximity sensor used is the "Fully Integrated Proximity and Ambient Light Sensor With Infrared Emitter", part vcnl4020 of Vishay \cite{proxsensor}. Four of these sensors are in the bottom of the AMiRo, programmed as light sensors, while other eight of these sensors are being used as proximity sensors and ambient light detectors coordinated by the Power Management board, see section \ref{PWB} for more information.
 
@@ -716,8 +717,8 @@ When the id for the power status is asked, four values are sent within one CAN f
 	\hline
 	DLC										&	6																	&																					\\	\hline
 	size of data					&	8bits, 8bits, 16bits, and 16bits	&																					\\	\hline
-	charging flag					&	DLC[0]														& '0' for not charging, '1' for charging	\\	\hline
-	state of charge				&	DLC[1] 														&	percentage															\\	\hline
+	charging flag					&	DLC[0]														& '0' off, '1' on													\\	\hline
+	state of charge				&	DLC[1] 														&	\%																			\\	\hline
 	time until charge			&	DLC[3] DLC[2] 										&																					\\	\hline
 	power consumption			&	DLC[5] DLC[4] 										&																					\\	\hline
 	units									&	percentage, minutes, $mW$					&																					\\	\hline
@@ -853,9 +854,9 @@ For creating an application that the \textit{Reflective Operator} can run, it is
 scp anyFile root@192.168.0.1:~
 \end{lstlisting}
 
-\section{Compiling from a Simulink model for MuRoX}
+\section{Simulink model compatibility}
 \label{sec:matlab}
-Alternatively, an application for the \textit{Reflective Operator} can be also compiled form a Simulink model. For this purpose, the user can modify the Simulink model that is already a part of the project inside the \textit{Reflective\_Operator/Matlab\_Reflective\_Operator} path from figure \ref{fig:DAAMIROstr}. Once the model has been edited, the user has to generate the code using the Matlab solver with the current settings.
+Alternatively, an application for the \textit{Reflective Operator} can be also compiled form a Simulink model. For this purpose, the user can modify the Simulink model that is already a part of the project inside the \\ \textit{Reflective\_Operator/Matlab\_Reflective\_Operator} path from figure \ref{fig:DAAMIROstr}. Once the model has been edited, the user has to generate the code using the Matlab solver with the current settings.
 
 After the code has been successfully generated, the user must go into the \textit{Reflective\_Operator/Demo\_Applications/Demo\_Matlab\_Reflective\_Operator} directory where a bash file with the name of \textit{matlab\_amiro\_setup.sh} is. When executed, this shell script copies the necessary files into the current folder, copies a custom makefile that was created to cross-compile with the requirements for the MuRoX board, and compiles the application. The generated binary can be copied into the MuRoX board with the method described in section \ref{sec:poky}.
 
@@ -952,7 +953,7 @@ In this section the performance of the AMiRo will be revised based the results o
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=\textwidth, height=15cm]{standalone_1}
+	\includegraphics[width=12cm, height=14cm]{standalone_1}
   	\caption{Demo Standalone results part 1}
   	\label{fig:res1}
 \end{figure}
@@ -996,7 +997,11 @@ What appears to be similar between these two projects is the CAN broadcasting of
 One of the biggest advantages of the DA\_AMiRo project is the compatibility of the Simulink models from Matlab to generate applications for the Reflective Operator of the AMiRo. The students can easily edit the given model to operate according a desired goal. This method is easy because with the Simulink model the students can change logic in a visual fashion rather than a code one. Instead of having to remember the CAN frame conventions or worrying about a programming language issue, they can simply change the values of the model or create logic with simple block logic in Simulink.
 
 \clearpage
-\section{Outlook}
+\chapter{Outlook}
+Throughout the thesis, some concepts like real-time operating systems, and the \textit{Operator Controller Module} were exposed. The AMiRo was then introduced, starting from the hardware components and functionality, and finishing with the software with which the robot was firstly introduced by the University of Bielefeld. It was then explained how the system worked and how it was replaced by the \textit{Operator Controller Module} model, under the name of DA\_AMiRo project.
+
+Afterwards the DA\_AMiRo structure and functionality was thoroughly discussed, explaining also the CAN conventions used for handling the CAN frames, and how to read the output of each sensor involved in the thesis. The sensor data handler was also introduced and explained, finalizing with the \textit{Internal Controller}. The \textit{Reflective Operator} is then presented and they way it communicates with the \textit{Internal Controller} discussed. After giving some background for the demo applications that are already able to run on the AMiRo, the resulting performance of the AMiRo is discussed and analyzed. Finally, the DA\_AMiRo and the AMiRo OS systems were compared in terms of efficiency, usability, and functionality.
+
 The real-time functionality in the DA\_AMiRo project is works as expected: it fulfills the performance deadlines and does not loose packages. After performing a stress test on the system, the error range or delays found are still small enough to make the project fulfill the requirements of a soft real-time system.
 
 The system is also capable of handling all the available tasks from the sensors at once, and communicates successfully with the actuators, changing its values at the will of the user. On top of this, the DA\_AMiRo project is fulfilling the CAN frame conventions established by Uwe Jahn.
